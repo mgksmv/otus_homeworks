@@ -29,10 +29,10 @@ def get_inner_links(links):
     for link in links:
         try:
             all_a_tags = get_soup(link).find_all('a')
-            inner_links = [inner_link.get('href') for inner_link in all_a_tags if 'https://' in inner_link.get('href')]
+            inner_links = [inner_link.get('href') for inner_link in all_a_tags if inner_link.get('href') and 'https://' in inner_link.get('href')]
             all_inner_links.append(inner_links)
-        except:
-            pass
+        except Exception as e:
+            print(e)
     return all_inner_links
 
 
