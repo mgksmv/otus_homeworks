@@ -7,7 +7,7 @@ def get_url(page_num: int):
 
 
 def get_soup(url):
-    response = requests.get(url)
+    response = requests.get(url, timeout=1)
     soup = BeautifulSoup(response.text, 'html.parser')
     return soup
 
