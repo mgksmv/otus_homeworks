@@ -6,8 +6,11 @@ class YcombinatorParser:
     def __init__(self, page: int):
         self.url = f'https://news.ycombinator.com/news?p={page}'
 
+    def get_response(self):
+        return requests.get(self.url, timeout=1)
+
     def get_soup(self):
-        response = requests.get(self.url, timeout=1)
+        response = self.get_response()
         soup = BeautifulSoup(response.text, 'html.parser')
         return soup
 
