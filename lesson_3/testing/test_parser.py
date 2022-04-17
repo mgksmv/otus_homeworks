@@ -17,24 +17,24 @@ def parser() -> YcombinatorParser:
     return YcombinatorParser(1)
 
 
-@patch.object(YcombinatorParser, 'get_response')
+def mock_get_response(*args, **kwargs):
+    return Response()
+
+
+@patch.object(YcombinatorParser, 'get_response', mock_get_response)
 class TestParser:
-    def test_get_soup(self, mock_get_response, parser):
-        mock_get_response.return_value = Response()
+    def test_get_soup(self, parser):
         soup = parser.get_soup()
         assert isinstance(soup, BeautifulSoup) is True
 
-    def test_get_links(self, mock_get_response, parser):
-        mock_get_response.return_value = Response()
+    def test_get_links(self, parser):
         links = parser.get_links()
         assert links is not None
 
-    def test_one_link(self, mock_get_response, parser):
-        mock_get_response.return_value = Response()
+    def test_one_link(self, parser):
         link = parser.get_links()[0]
         assert link.startswith('https') is True
 
-    def test_get_inner_links(self, mock_get_response, parser):
-        mock_get_response.return_value = Response()
+    def test_get_inner_links(self, parser):
         inner_links = parser.get_inner_links(parser.get_links())
         assert inner_links is not None
