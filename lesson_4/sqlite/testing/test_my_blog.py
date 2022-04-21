@@ -2,8 +2,8 @@ from pytest import fixture, mark, raises
 from sqlalchemy.orm import Session as SessionType
 
 from lesson_4.sqlite.db_settings import Session
-from lesson_4.sqlite.crud import create_tables, drop_tables, create_user, create_post, create_tag
-from lesson_4.sqlite.models import User, Post, Tag
+from lesson_4.sqlite.crud import create_tables, drop_tables, create_user, create_post, create_tag, create_comment
+from lesson_4.sqlite.models import User, Post, Tag, Comment
 
 
 @fixture
@@ -92,3 +92,14 @@ class TestBlog:
         assert post.title == expected_title
         assert post.text == expected_text
         assert all_posts.count() == 3
+
+    @mark.parametrize('text, user_id, expected_result', [
+        ('wow', 3, 1),
+        ('nice', 2, 2),
+        ('cool', 1, 3),
+    ])
+    def test_create_comments(self, session: SessionType, test_db, text, user_id, expected_result):
+        new_comment = create_comment(session, text, user_id)
+        all_comments = session.query(Comment)
+        assert all_comments.count() == expected_result
+        assert new_comment.text == text
