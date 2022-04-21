@@ -94,7 +94,7 @@ class TestBlog:
         assert all_posts.count() == 3
 
     @mark.parametrize('text, user_id, expected_result', [
-        ('wow', 3, 1),
+        ('wow!', 3, 1),
         ('nice', 2, 2),
         ('cool', 1, 3),
     ])
