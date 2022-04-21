@@ -3,8 +3,13 @@ from pprint import pprint
 
 from sqlalchemy.orm import Session
 from faker import Faker
-from lesson_4.sqlite.db_settings import Base, Session
-from lesson_4.sqlite.models import User, Tag, Post, Comment
+
+try:
+    from .db_settings import Base, Session
+    from .models import User, Tag, Post, Comment
+except ImportError:
+    from db_settings import Base, Session
+    from models import User, Tag, Post, Comment
 
 
 def create_tables():

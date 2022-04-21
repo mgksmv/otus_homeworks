@@ -1,4 +1,4 @@
-from pytest import fixture, mark
+from pytest import fixture, mark, raises
 from sqlalchemy.orm import Session as SessionType
 
 from lesson_4.sqlite.db_settings import Session
@@ -21,78 +21,74 @@ def test_db():
 
 
 class TestBlog:
-    # @mark.parametrize('username, email', [
-    #     ('1', '1@email.com'),
-    #     ('2', '2@email.com'),
-    #     ('3', '3@email.com'),
-    # ])
-    # def test_create_users(self, session: SessionType, test_db, username, email):
-    #     new_user = create_user(session, username, email)
-    #     all_users = session.query(User).count()
-    #     assert all_users == 3
+    @mark.parametrize('username, email, expected_result', [
+        ('goose', 'goose@email.com', 1),
+        ('duck', 'duck@email.com', 2),
+        ('swan', 'swan@email.com', 3),
+    ])
+    def test_create_users(self, session: SessionType, test_db, username, email, expected_result):
+        new_user = create_user(session, username, email)
+        all_users = session.query(User)
+        assert all_users.count() == expected_result
 
-    def test_create_users(self, session: SessionType, test_db):
-        data = {
-            'goose': 'goose@email.com',
-            'duck': 'duck@email.com',
-            'swan': 'swan@email.com',
-        }
-        for username, email in data.items():
-            new_user = create_user(session, username, email)
-        count_all_users = session.query(User).count()
-        assert count_all_users == 3
+    @mark.parametrize('user_id, expected_id, expected_username', [
+        (1, 1, 'goose'),
+        (2, 2, 'duck'),
+        (3, 3, 'swan'),
+    ])
+    def test_get_user(self, session: SessionType, test_db, user_id, expected_id, expected_username):
+        user = session.get(User, user_id)
+        assert user.id == expected_id
+        assert user.username == expected_username
 
-    def test_get_user(self, session: SessionType, test_db):
-        user = session.get(User, 1)
-        assert user.id == 1
-
-    def test_create_tags(self, session: SessionType, test_db):
-        tag_names = ['sport', 'animals', 'music', 'birds']
-        for tag_name in tag_names:
-            new_tag = create_tag(session, tag_name)
-        all_tags = session.query(Tag).all()
-        count_all_tags = session.query(Tag).count()
-        assert count_all_tags == 4
-        assert all_tags[0].name == 'sport'
+    @mark.parametrize('tag_name, expected_result', [
+        ('sport', 1),
+        ('animals', 2),
+        ('music', 3),
+    ])
+    def test_create_tags(self, session: SessionType, test_db, tag_name, expected_result):
+        new_tag = create_tag(session, tag_name)
+        all_tags = session.query(Tag)
+        assert all_tags.count() == expected_result
+        assert new_tag.name == tag_name
 
     def test_create_posts(self, session: SessionType, test_db):
+        new_tag = create_tag(session, 'birds')
         data = [
             {
                 'id': 1,
                 'title': 'honk!',
                 'text': 'I am a goose and I can honk!',
-                'tag_id': 4
+                'tag_id': new_tag.id
             },
             {
                 'id': 2,
                 'title': 'quack!',
                 'text': 'Hey, the duck is here, stay tuned for more useless info, bye.',
-                'tag_id': 4
-            },
-            {
-                'id': 2,
-                'title': 'quack!',
-                'text': 'Here I am again with another useless blog!',
-                'tag_id': 4
+                'tag_id': new_tag.id
             },
             {
                 'id': 3,
                 'title': 'honk',
                 'text': 'Hey. Just hey.',
-                'tag_id': 4
+                'tag_id': new_tag.id
             },
         ]
         for info in data:
             new_user = create_post(
                 session, user_id=info.get('id'), title=info.get('title'), text=info.get('text'), tag_id=info.get('tag_id')
             )
-        count_all_posts = session.query(Post).count()
-        assert count_all_posts == 4
+        all_posts = session.query(Post)
+        assert all_posts.count() == 3
 
-    def test_get_user_posts(self, session: SessionType, test_db):
-        posts = session.query(Post).filter_by(user_id=2)
-        assert posts[0].title == 'quack!'
-        assert posts[0].text == 'Hey, the duck is here, stay tuned for more useless info, bye.'
-        assert posts[1].title == 'quack!'
-        assert posts[1].text == 'Here I am again with another useless blog!'
-        assert posts.count() == 2
+    @mark.parametrize('user_id, expected_title, expected_text', [
+        (1, 'honk!', 'I am a goose and I can honk!'),
+        (2, 'quack!', 'Hey, the duck is here, stay tuned for more useless info, bye.'),
+        (3, 'honk', 'Hey. Just hey.'),
+    ])
+    def test_get_user_posts(self, session: SessionType, test_db, user_id, expected_title, expected_text):
+        post = session.query(Post).filter_by(user_id=user_id).first()
+        all_posts = session.query(Post)
+        assert post.title == expected_title
+        assert post.text == expected_text
+        assert all_posts.count() == 3

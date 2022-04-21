@@ -1,7 +1,11 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
-from lesson_4.sqlite.db_settings import Base
+
+try:
+    from .db_settings import Base
+except ImportError:
+    from db_settings import Base
 
 
 class User(Base):
