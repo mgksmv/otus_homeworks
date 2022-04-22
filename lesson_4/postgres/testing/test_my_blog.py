@@ -2,14 +2,14 @@ from pytest import fixture, mark
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from lesson_4.sqlite.db_settings import Base
-from lesson_4.sqlite.crud import create_user, create_post, create_tag, create_comment
-from lesson_4.sqlite.models import User, Post, Tag, Comment
+from lesson_4.postgres.db_settings import Base
+from lesson_4.postgres.crud import create_user, create_post, create_tag, create_comment
+from lesson_4.postgres.models import User, Post, Tag, Comment
 
 
 @fixture(scope='session', autouse=True)
 def engine():
-    return create_engine('sqlite:///test_blog.db')
+    return create_engine('postgresql+pg8000://localhost/test_database')
 
 
 @fixture(scope='session', autouse=True)
