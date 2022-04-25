@@ -9,7 +9,7 @@ from lesson_4.postgres.models import User, Post, Tag, Comment
 
 @fixture(scope='session', autouse=True)
 def engine():
-    return create_engine('postgresql+pg8000://test:test@5433:5432/test-blog')
+    return create_engine('postgresql+pg8000://test:test@localhost:5433/test-blog')
 
 
 @fixture(scope='session', autouse=True)
@@ -52,29 +52,27 @@ class TestBlog:
         assert all_tags.count() == 1
         assert new_tag.name == tag_name
 
-    @mark.parametrize('user_id, title, text', [
-        (1, 'honk!', 'I am a goose and I can honk!'),
-        (2, 'quack!', 'Hey, the duck is here, stay tuned for more useless info, bye.'),
-        (3, 'honk', 'Hey. Just hey.'),
+    @mark.parametrize('title, text', [
+        ('honk!', 'I am a goose and I can honk!'),
+        ('quack!', 'Hey, the duck is here, stay tuned for more useless info, bye.'),
+        ('honk', 'Hey. Just hey.'),
     ])
-    def test_create_posts(self, session: Session, user_id, title, text):
+    def test_create_posts(self, session: Session, title, text):
+        new_user = create_user(session, 'goose', 'goose@gmail.com')
         new_tag = create_tag(session, 'birds')
-        new_post = create_post(session, user_id=user_id, title=title, text=text, tags=[new_tag])
+        new_post = create_post(session, user_id=new_user.id, title=title, text=text, tags=[new_tag])
         all_posts = session.query(Post)
         assert new_tag is not None
         assert all_posts.count() == 1
-        assert new_post.user_id == user_id
+        assert new_post.user_id == new_user.id
         assert new_post.title == title
         assert new_post.text == text
 
-    @mark.parametrize('text, user_id', [
-        ('wow!', 1),
-        ('nice', 2),
-        ('cool', 3),
-    ])
-    def test_create_comments(self, session: Session, text, user_id):
-        new_comment = create_comment(session, text, user_id)
+    @mark.parametrize('text', ['wow!', 'nice', 'cool'])
+    def test_create_comments(self, session: Session, text):
+        new_user = create_user(session, 'goose', 'goose@gmail.com')
+        new_comment = create_comment(session, text, new_user.id)
         all_comments = session.query(Comment)
         assert all_comments.count() == 1
         assert new_comment.text == text
-        assert new_comment.user_id == user_id
+        assert new_comment.user_id == new_user.id
