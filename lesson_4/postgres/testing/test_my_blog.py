@@ -9,7 +9,7 @@ from lesson_4.postgres.models import User, Post, Tag, Comment
 
 @fixture(scope='session', autouse=True)
 def engine():
-    return create_engine('postgresql+pg8000://localhost/test_database')
+    return create_engine('postgresql+pg8000://test:test@5433:5432/test-blog')
 
 
 @fixture(scope='session', autouse=True)
