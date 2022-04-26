@@ -1,0 +1,46 @@
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background-color: #000;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  position: relative;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+#canvas {
+  position: fixed;
+  overflow: auto;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.objects {
+  color: rgb(21, 21, 21);
+  flex: 1 0 auto;
+}
+
+.date {
+  text-align: right;
+}
+
+.nav-link:hover {
+  color: #fff !important;
+  background-color: #198754;
+  border-radius: .25rem;
+}
+
+.content {
+  position: relative;
+}
