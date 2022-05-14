@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Tag{% endblock %}
+
+{% block content %}
+
+    <div class="container content">
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <a href="{{ url_for('blogs_app.all_tags') }}" class="btn btn-danger mt-4 mb-3">
+                    <i class="fa-solid fa-angle-left"></i>
+                    Go back
+                </a>
+                <h1 class="text-center text-white">Edit Tag</h1>
+            </div>
+            <div class="col-2"></div>
+        </div>
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="name" class="form-label text-white">Name</label>
+                        <input type="text" name="name" required="required" class="form-control" id="name"
+                               aria-describedby="name" value="{{ tag.name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="color" class="form-label text-white">Select color:</label>
+                        <input type="color" id="color" name="color" value="#{{ tag.color }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </div>
+
+{% endblock %}

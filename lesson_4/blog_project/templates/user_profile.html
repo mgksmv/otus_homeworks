@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+
+    <div class="container content">
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <div class="mt-4">
+                    {% include 'includes/messages.html' %}
+                </div>
+                <div class="row">
+                    <div class="col-2"></div>
+                    <div class="col-8">
+                        <div class="text-center mb-4 mt-4 p-3">
+                            <h1 class="pb-2 text-white">@{{ user.username }}
+                                {% if current_user.id == user.id %}
+                                     <a href="{{ url_for('accounts_app.edit_user_profile', user_id=user.id) }}"
+                                        class="btn btn-primary btn-sm">
+                                        <i class="fa-solid fa-pen-to-square"></i>  Edit profile
+                                    </a>
+                                {% endif %}
+                            </h1>
+                            {% if user.is_admin %}
+                                <h5><span class="badge bg-secondary mb-3">Admin</span></h5>
+                            {% endif %}
+                            {% if user.first_name and user.last_name %}
+                                <h4 class="text-white">{{ user.first_name }} {{ user.last_name }}</h4>
+                            {% elif user.first_name %}
+                                <h4 class="text-white">{{ user.first_name }}</h4>
+                            {% elif user.last_name %}
+                                <h4 class="text-white">{{ user.last_name }}</h4>
+                            {% endif %}
+                            {% if user.bio %}
+                                {{ user.bio|safe }}
+                            {% else %}
+                                <p class="fst-italic text-white mb-0">No bio is provided</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="text-center pb-3">
+                    {% if current_user.id == user.id %}
+                        <a href="{{ url_for('blogs_app.add_blog') }}" class="btn btn-success m-2">
+                            <i class="fa-solid fa-plus"></i>  Add a new blog
+                        </a>
+                    {% endif %}
+                </div>
+                {% if user_blogs.items %}
+                    {% for blog in user_blogs.items %}
+                        <div class="py-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class="mb-0 h5">@{{ blog.user.username }}</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class="date mb-0">
+                                                <i class="fa-solid fa-calendar-days"></i>
+                                                {{ blog.created_at.strftime('%H:%S') }} •
+                                                {{ blog.created_at.strftime('%d %b %Y') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    {% if blog.tags %}
+                                        {% for tag in blog.tags %}
+                                            <span class="badge"
+                                                  style="background-color: #{{ tag.color }};">{{ tag }}</span>
+                                        {% endfor %}
+                                    {% endif %}
+                                    <h3 class="card-title pt-2">{{ blog.title }}</h3>
+                                    <p class="card-text">
+                                        {{ blog.text|safe }}
+                                    </p>
+                                    <a href="{{ url_for('blogs_app.get_blog', blog_id=blog.id) }}"
+                                       class="btn btn-success">Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    {% if user_blogs.pages > 1 %}
+                        <nav>
+                            <ul class="pagination justify-content-center mt-4">
+                                {% if user_blogs.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                           href="{{ url_for('accounts_app.get_user_profile', user_id=user.id, page=user_blogs.prev_num) }}">
+                                            Previous
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link btn disabled" href="#">Previous</a></li>
+                                {% endif %}
+                                {% for page_num in user_blogs.iter_pages() %}
+                                    <li class="page-item {% if page_num == user_blogs.page %}active{% endif %}">
+                                        <a class="page-link"
+                                           href="{{ url_for('accounts_app.get_user_profile', user_id=user.id, page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                                {% if user_blogs.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                           href="{{ url_for('accounts_app.get_user_profile', user_id=user.id, page=user_blogs.next_num) }}">
+                                            Next
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link btn disabled" href="#">Next</a></li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <p class="text-center text-white fst-italic">The user has not posted anything yet.</p>
+                {% endif %}
+            </div>
+            <div class="col-2"></div>
+        </div>
+    </div>
+
+{% endblock %}
