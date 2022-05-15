@@ -27,14 +27,14 @@
             <div class="col-3"></div>
             <div class="col-6">
                 <form method="post">
+                    {{ form.hidden_tag() }}
                     <div class="mb-3">
-                        <label for="title" class="form-label text-white">Title</label>
-                        <input type="text" name="title" required="required" class="form-control" id="title"
-                               aria-describedby="username">
+                        {{ form.title.label(class='form-label text-white') }}
+                        {{ form.title(id='title', class='form-control') }}
                     </div>
                     <label for="text" class="form-label text-white">Text</label>
                     <div class="mb-3">
-                        {{ ckeditor.create() }}
+                        {{ form.text() }}
                     </div>
                     <label for="tags" class="text-white">Choose a tag</label>
                     <div class="mb-3">

@@ -12,3 +12,8 @@ class BlogForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     text = CKEditorField('Text', validators=[DataRequired()])
     tags = SelectMultipleField('Choose a tag')
+
+
+class TagForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    color = StringField('Select color:', validators=[DataRequired()])

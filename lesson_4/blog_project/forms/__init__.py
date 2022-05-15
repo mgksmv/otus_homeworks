@@ -1,4 +1,13 @@
-__all__ = ('CommentForm', 'BlogForm', 'SingUpForm', 'LoginForm', 'EditUserForm', 'ResetEmailForm', 'ResetPasswordForm')
+__all__ = (
+    'CommentForm',
+    'BlogForm',
+    'SingUpForm',
+    'LoginForm',
+    'EditUserForm',
+    'ResetEmailForm',
+    'ResetPasswordForm',
+    'TagForm'
+)
 
-from .blogs import CommentForm, BlogForm
+from .blogs import CommentForm, BlogForm, TagForm
 from .accounts import SingUpForm, LoginForm, EditUserForm, ResetEmailForm, ResetPasswordForm

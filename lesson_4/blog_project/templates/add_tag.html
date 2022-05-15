@@ -20,14 +20,14 @@
             <div class="col-4"></div>
             <div class="col-4">
                 <form method="post">
+                    {{ form.hidden_tag() }}
                     <div class="mb-3">
-                        <label for="name" class="form-label text-white">Name</label>
-                        <input type="text" name="name" required="required" class="form-control" id="name"
-                               aria-describedby="name">
+                        {{ form.name.label(class='form-label text-white') }}
+                        {{ form.name(id='name', class='form-control') }}
                     </div>
                     <div class="mb-3">
-                        <label for="color" class="form-label text-white">Select color:</label>
-                        <input type="color" id="color" name="color" value="#ff0000">
+                        {{ form.color.label(class='form-label text-white') }}
+                        {{ form.color(id='name', type='color', value='#ff0000') }}
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>

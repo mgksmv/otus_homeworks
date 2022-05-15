@@ -4,7 +4,7 @@ from flask import Blueprint, request, render_template, abort, url_for, redirect,
 from flask_login import login_required, current_user
 
 from lesson_4.blog_project.models import Blog, User, Comment, db, Tag
-from lesson_4.blog_project.forms import CommentForm, BlogForm
+from lesson_4.blog_project.forms import CommentForm, BlogForm, TagForm
 
 blogs_app = Blueprint('blogs_app', __name__)
 
@@ -66,13 +66,14 @@ def get_blog(blog_id):
 @login_required
 def add_blog():
     tags = Tag.query.all()
+    form = BlogForm()
 
     if request.method == 'POST':
-        tag_ids = request.form.getlist('tags')
+        tag_ids = form.tags.data
         tags = [Tag.query.filter_by(id=tag_id).one_or_none() for tag_id in tag_ids]
         new_blog = Blog(
-            title=request.form.get('title'),
-            text=request.form.get('ckeditor'),
+            title=form.title.data,
+            text=form.text.data,
             tags=tags,
             user=current_user,
         )
@@ -85,7 +86,7 @@ def add_blog():
             return redirect(url_for('accounts_app.get_user_profile', user_id=current_user.id))
         return redirect(url_for('main_app.home'))
 
-    return render_template('add_blog.html', tags=tags)
+    return render_template('add_blog.html', tags=tags, form=form)
 
 
 @blogs_app.route('/edit-blog/<int:blog_id>/', methods=['GET', 'POST'])
@@ -126,17 +127,19 @@ def all_tags():
 @login_required
 @admin_only
 def add_tag():
+    form = TagForm()
     if request.method == 'POST':
-        new_tag = Tag(
-            name=request.form.get('name'),
-            color=request.form.get('color')[1:],
-        )
-        db.session.add(new_tag)
-        db.session.commit()
-        flash('The tag has been successfully created.', category='info')
-        return redirect(url_for('blogs_app.all_tags'))
+        if form.validate_on_submit():
+            new_tag = Tag(
+                name=form.name.data,
+                color=form.color.data[1:],
+            )
+            db.session.add(new_tag)
+            db.session.commit()
+            flash('The tag has been successfully created.', category='info')
+            return redirect(url_for('blogs_app.all_tags'))
 
-    return render_template('add_tag.html')
+    return render_template('add_tag.html', form=form)
 
 
 @blogs_app.route('/edit-tag/<int:tag_id>/', methods=['GET', 'POST'])
@@ -144,14 +147,17 @@ def add_tag():
 @admin_only
 def edit_tag(tag_id):
     tag = Tag.query.filter_by(id=tag_id).one()
+    tag_color = f'#{tag.color}'
+    form = TagForm()
     if request.method == 'POST':
-        tag.name = request.form.get('name')
-        tag.color = request.form.get('color')[1:]
-        db.session.commit()
-        flash('The tag has been successfully updated.', category='info')
-        return redirect(url_for('blogs_app.all_tags'))
+        if form.validate_on_submit():
+            tag.name = form.name.data
+            tag.color = form.color.data[1:]
+            db.session.commit()
+            flash('The tag has been successfully updated.', category='info')
+            return redirect(url_for('blogs_app.all_tags'))
 
-    return render_template('edit_tag.html', tag=tag)
+    return render_template('edit_tag.html', tag=tag, form=form, tag_color=tag_color)
 
 
 @blogs_app.route('/delete-tag/<int:tag_id>/', methods=['GET', 'POST'])
