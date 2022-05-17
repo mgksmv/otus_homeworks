@@ -4,6 +4,8 @@
 
 `pip install -r requirements` Устанавливаем все необходимые зависимости
 
+Добавляем SECRET_KEY и DEBUG в .env и убраем с названия часть .template
+
 `python manage.py makemigrations onlineschool` Делаем миграции
 
 `python manage.py migrate` Применяем миграции и создаём таблицы в БД
