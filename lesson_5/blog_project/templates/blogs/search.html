@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Search results{% endblock %}
+
+{% block content %}
+
+    <div class="container content">
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <div class="mt-4">
+                    {% include 'includes/messages.html' %}
+                </div>
+                <h1 class="text-center pt-4 pb-4 text-white">Search results for "{{ keyword }}"</h1>
+                {% if data %}
+                    {% if data.total > 0 %}
+                        {% if select == 'blogs' %}
+                            <h3 class="text-center text-white">Found blogs:</h3>
+                            {% for blog in data.items %}
+                                <div class="py-2">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <a href="{{ url_for('accounts_app.get_user_profile', user_id=blog.user_id) }}"
+                                                       class="mb-0 h5">
+                                                        {% if user.id == blog.user_id %}
+                                                            <i class="fa-solid fa-user"></i>
+                                                        {% endif %}
+                                                        @{{ blog.user.username }}
+                                                    </a>
+                                                </div>
+                                                <div class="col-6">
+                                                    <p class="date mb-0">
+                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                        {{ blog.created_at.strftime('%H:%S') }} •
+                                                        {{ blog.created_at.strftime('%d %b %Y') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            {% if blog.tags %}
+                                                {% for tag in blog.tags %}
+                                                    <span class="badge"
+                                                          style="background-color: #{{ tag.color }};">{{ tag }}</span>
+                                                {% endfor %}
+                                            {% endif %}
+                                            <h3 class="card-title pt-2">{{ blog.title }}</h3>
+                                            <p class="card-text">
+                                                {{ blog.text|safe }}
+                                            </p>
+                                            <a href="{{ url_for('blogs_app.get_blog', blog_id=blog.id) }}"
+                                               class="btn btn-success">Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <h3 class="text-center text-white">Found users:</h3>
+                            {% for user in data.items %}
+                                <h4>
+                                    <i class="fa-solid fa-user text-white"></i>
+                                    <a href="{{ url_for('accounts_app.get_user_profile', user_id=user.id) }}" class="text-white">
+                                         {{ user.username }}
+                                        <span class="fw-light">
+                                            {% if user.first_name and user.last_name %}
+                                                ({{ user.first_name }} {{ user.first_name }})
+                                            {% elif user.first_name %}
+                                                ({{ user.first_name }})
+                                            {% elif user.last_name %}
+                                                ({{ user.last_name }})
+                                            {% endif %}
+                                        </span>
+                                    </a>
+                                </h4>
+                            {% endfor %}
+                        {% endif %}
+                        {% if data.pages > 1 %}
+                            <nav>
+                                <ul class="pagination justify-content-center mt-4">
+                                    {% if data.has_prev %}
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="{{ url_for('blogs_app.search_blogs', page=data.prev_num) }}&select={{ select }}&keyword={{ keyword }}">
+                                                Previous
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link btn disabled" href="#">Previous</a>
+                                        </li>
+                                    {% endif %}
+                                    {% for page_num in data.iter_pages() %}
+                                        <li class="page-item {% if page_num == data.page %}active{% endif %}">
+                                            <a class="page-link"
+                                               href="{{ url_for('blogs_app.search_blogs', page=page_num) }}&select={{ select }}&keyword={{ keyword }}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                    {% if data.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link"
+                                               href="{{ url_for('blogs_app.search_blogs', page=data.next_num) }}&select={{ select }}&keyword={{ keyword }}">
+                                                Next
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link btn disabled" href="#">Next</a></li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-center text-white">Nothing found</p>
+                    {% endif %}
+                {% else %}
+                    <p class="text-center text-white">Nothing found</p>
+                {% endif %}
+            </div>
+            <div class="col-2"></div>
+        </div>
+    </div>
+
+{% endblock %}

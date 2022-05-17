@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Home page{% endblock %}
+
+{% block content %}
+
+    <div class="container content">
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <div class="mt-4">
+                    {% include 'includes/messages.html' %}
+                </div>
+                <h1 class="text-center pt-4 pb-4 text-white">All blogs</h1>
+                <div class="text-center pb-3">
+                    <a href="{{ url_for('blogs_app.add_blog') }}" class="btn btn-success m-2">
+                        <i class="fa-solid fa-plus"></i>  Add a new blog
+                    </a>
+                    {% if user.is_admin %}
+                        <a href="{{ url_for('blogs_app.all_tags') }}" class="btn btn-primary m-2">
+                            <i class="fa-solid fa-tag"></i>  View all tags
+                        </a>
+                    {% endif %}
+                </div>
+                {% for blog in all_blogs.items %}
+                    <div class="py-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <a href="{{ url_for('accounts_app.get_user_profile', user_id=blog.user_id) }}"
+                                           class="mb-0 h5">
+                                            {% if user.id == blog.user_id %}
+                                                <i class="fa-solid fa-user"></i>
+                                            {% endif %}
+                                            @{{ blog.user.username }}
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <p class="date mb-0">
+                                            <i class="fa-solid fa-calendar-days"></i>
+                                            {{ blog.created_at.strftime('%H:%M') }} •
+                                            {{ blog.created_at.strftime('%d %b %Y') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                {% if blog.tags %}
+                                    {% for tag in blog.tags %}
+                                        <span class="badge" style="background-color: #{{ tag.color }};">{{ tag }}</span>
+                                    {% endfor %}
+                                {% endif %}
+                                <h3 class="card-title pt-2">{{ blog.title }}</h3>
+                                <p class="card-text">
+                                    {{ blog.text|safe }}
+                                </p>
+                                <a href="{{ url_for('blogs_app.get_blog', blog_id=blog.id) }}" class="btn btn-success">Details</a>
+                                {% if not blog in user.bookmarks %}
+                                    <a href="{{ url_for('blogs_app.add_bookmark', blog_id=blog.id) }}" class="btn btn-outline-secondary">
+                                        <i class="fa-solid fa-star"></i>  Add to bookmarks
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('blogs_app.delete_bookmark', blog_id=blog.id) }}" class="btn btn-outline-danger">
+                                        <i class="fa-solid fa-star"></i>  Delete from bookmarks
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% if all_blogs.pages > 1 %}
+                    <nav>
+                        <ul class="pagination justify-content-center mt-4">
+                            {% if all_blogs.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('main_app.home', page=all_blogs.prev_num) }}">
+                                        Previous
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link btn disabled" href="#">Previous</a></li>
+                            {% endif %}
+                            {% for page_num in all_blogs.iter_pages() %}
+                                <li class="page-item {% if page_num == all_blogs.page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('main_app.home', page=page_num) }}">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            {% if all_blogs.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('main_app.home', page=all_blogs.next_num) }}">
+                                        Next
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link btn disabled" href="#">Next</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            </div>
+            <div class="col-2"></div>
+        </div>
+    </div>
+
+{% endblock %}

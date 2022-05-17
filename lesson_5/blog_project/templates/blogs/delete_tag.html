@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete the tag{% endblock %}
+
+{% block content %}
+
+    <div class="container content text-center">
+        <h1 class="text-center pt-5 pb-4 text-white">Delete the tag</h1>
+        <h5 class="text-center text-white">Are you sure you want to delete the tag "{{ tag }}"?</h5>
+        <div class="row pt-3">
+            <div class="col-6" style="text-align: right;">
+                <a href="{{ url_for('blogs_app.all_tags') }}" class="btn btn-success"><i class="fa-solid fa-arrow-left"></i>  Back</a>
+            </div>
+            <div class="col-6" style="text-align: left;">
+                <form method="post">
+                    <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i>  Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

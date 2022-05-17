@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Add a new tag{% endblock %}
+
+{% block content %}
+
+    <div class="container content">
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <a href="{{ url_for('blogs_app.all_tags') }}" class="btn btn-danger mt-4 mb-3">
+                    <i class="fa-solid fa-angle-left"></i>
+                    Go back
+                </a>
+                <h1 class="text-center text-white">Add a new tag</h1>
+            </div>
+            <div class="col-2"></div>
+        </div>
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.name.label(class='form-label text-white') }}
+                        {{ form.name(id='name', class='form-control') }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.color.label(class='form-label text-white') }}
+                        {{ form.color(id='name', type='color', value='#ff0000') }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </div>
+
+{% endblock %}

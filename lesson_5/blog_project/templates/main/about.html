@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+
+    <div class="container content">
+        <h1 class="text-center pt-5 pb-4 text-white">About</h1>
+        <div class="text-center">
+            <p class="text-white h5 pb-3">
+                Welcome to My Blog project! In this website you can post anything you want,
+                be it a story about your cat or the latest world news!
+            </p>
+            <a href="{{ url_for('main_app.home') }}" class="btn btn-success">Back to Home Page</a>
+        </div>
+    </div>
+
+{% endblock %}

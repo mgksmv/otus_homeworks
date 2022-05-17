@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}All tags{% endblock %}
+
+{% block content %}
+
+    <div class="container content">
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <a href="{{ url_for('main_app.home') }}" class="btn btn-danger mt-4 mb-3">
+                    <i class="fa-solid fa-angle-left"></i>
+                    Go back
+                </a>
+                {% include 'includes/messages.html' %}
+                <h1 class="text-center text-white">All tags</h1>
+            </div>
+            <div class="col-2"></div>
+        </div>
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <div class="text-center pb-3">
+                    <a href="{{ url_for('blogs_app.add_tag') }}" class="btn btn-success m-2">
+                        <i class="fa-solid fa-tag"></i>  Add a new tag
+                    </a>
+                </div>
+                {% for tag in tags %}
+                    <div class="py-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">{{ tag.name }}</h4>
+                                <a href="{{ url_for('blogs_app.edit_tag', tag_id=tag.id) }}" class="btn btn-primary">
+                                    <i class="fa-solid fa-pen-to-square"></i>  Edit
+                                </a>
+                                <a href="{{ url_for('blogs_app.delete_tag', tag_id=tag.id) }}" class="btn btn-danger">
+                                    <i class="fa-solid fa-xmark"></i>  Delete
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </div>
+
+{% endblock %}
