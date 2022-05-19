@@ -7,8 +7,9 @@ def test_home_page(client):
     assert response.status_code == 302
 
 
-def test_home_page_with_user(client, user):
-    response = client.post('/login/', data={'username': 'testuser', 'password': 'password'})
-    assert response.status_code == 200
-    new_response = client.get(url_for('main_app.home'))
-    assert b'All blogs' in new_response.data
+def test_home_page_with_user(client):
+    with client.session_transaction() as session:
+        response = client.post('/login/', data={'username': 'testuser', 'password': 'password'})
+        assert response.status_code == 200
+        new_response = client.get(url_for('main_app.home'))
+        assert b'All blogs' in new_response.data
