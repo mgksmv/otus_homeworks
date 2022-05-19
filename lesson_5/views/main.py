@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 from flask_login import login_required
 
-from lesson_5.blog_project.models import Blog
+from lesson_5.models import Blog
 
 main_app = Blueprint('main_app', __name__)
 

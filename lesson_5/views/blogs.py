@@ -3,8 +3,8 @@ from functools import wraps
 from flask import Blueprint, request, render_template, abort, url_for, redirect, flash
 from flask_login import login_required, current_user
 
-from lesson_5.blog_project.models import db, Blog, User, Comment, Tag
-from lesson_5.blog_project.forms import CommentForm, BlogForm, TagForm
+from lesson_5.models import db, Blog, User, Comment, Tag
+from lesson_5.forms import CommentForm, BlogForm, TagForm
 
 blogs_app = Blueprint('blogs_app', __name__)
 
@@ -105,6 +105,7 @@ def edit_blog(blog_id):
     if current_user.id == blog.user_id:
         if request.method == 'GET':
             form.text.data = blog.text
+            form.tags.data = [tag.id for tag in blog.tags]
         if request.method == 'POST':
             if form.validate_on_submit():
                 tag_ids = form.tags.data
@@ -116,6 +117,8 @@ def edit_blog(blog_id):
 
                 flash('The blog has been edited.', category='info')
                 return redirect(url_for('blogs_app.get_blog', blog_id=blog_id))
+            else:
+                print(form.errors)
 
         return render_template('blogs/edit_blog.html', blog=blog, form=form)
 
@@ -205,6 +208,6 @@ def delete_bookmark(blog_id):
 
 @blogs_app.route('/bookmarks/')
 @login_required
-def bookmarks():
-    get_user = current_user.query.filter_by(id=current_user.id).first_or_404()
-    return render_template('blogs/bookmarks.html', get_user=get_user)
+def get_bookmarks():
+    all_bookmarks = current_user.bookmarks
+    return render_template('blogs/bookmarks.html', all_bookmarks=all_bookmarks)

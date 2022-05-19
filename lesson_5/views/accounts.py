@@ -5,9 +5,9 @@ from threading import Thread
 from itsdangerous import URLSafeTimedSerializer
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from lesson_5.blog_project import app
-from lesson_5.blog_project.forms import SingUpForm, LoginForm, EditUserForm, ResetEmailForm, ResetPasswordForm
-from lesson_5.blog_project.models import db, User, Blog
+from lesson_5 import app
+from lesson_5.forms import SingUpForm, LoginForm, EditUserForm, ResetEmailForm, ResetPasswordForm
+from lesson_5.models import db, User, Blog
 
 accounts_app = Blueprint('accounts_app', __name__)
 mail = Mail(app)

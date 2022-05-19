@@ -1,13 +1,12 @@
 import click
-from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
 from flask_ckeditor import CKEditor
 from flask_bcrypt import Bcrypt
 from werkzeug.security import generate_password_hash
 
-from lesson_5.blog_project import app
-from lesson_5.blog_project.models import db, User
-from lesson_5.blog_project.views import accounts_app, blogs_app, main_app
+from lesson_5 import app
+from lesson_5.models import db, User
+from lesson_5.views import accounts_app, blogs_app, main_app
 
 
 def create_app():
@@ -15,16 +14,13 @@ def create_app():
     app.register_blueprint(blogs_app)
     app.register_blueprint(main_app)
 
-    db.init_app(app)
-    migrate = Migrate(app, db)
-
     login_manager = LoginManager()
     login_manager.init_app(app)
     login_manager.login_view = 'accounts_app.login'
     login_manager.login_message_category = 'danger'
 
-    ckeditor = CKEditor(app)
-    bcrypt = Bcrypt(app)
+    CKEditor(app)
+    Bcrypt(app)
 
     @login_manager.user_loader
     def load_user(user_id):

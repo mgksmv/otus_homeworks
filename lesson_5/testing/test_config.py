@@ -1,8 +1,8 @@
 from pytest import fixture
 
-from lesson_5.blog_project.app import create_app
-from lesson_5.blog_project.models import db, User
-from lesson_5.blog_project.views import accounts_app, blogs_app, main_app
+from lesson_5.app import create_app
+from lesson_5.models import db, User
+from lesson_5.views import accounts_app, blogs_app, main_app
 
 
 @fixture
