@@ -1,58 +1,38 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Teacher, Student, Review, Course, Schedule
+from .models import Teacher, Student, Review, Course, Schedule, Category
+from .forms import CategoryFormAdmin
 
 
 @admin.register(Teacher)
 class TeacherAdmin(admin.ModelAdmin):
 
-    @staticmethod
-    def thumbnail(obj: Teacher):
-        return format_html(f'<img src="{obj.photo.url}" width="100" />')
+    def thumbnail(self, obj: Teacher):
+        return format_html(f'<img src="{obj.user.photo.url}" width="100" />')
 
-    @staticmethod
-    def shorten_bio(obj: Teacher):
+    def shorten_bio(self, obj: Teacher):
         if len(obj.bio) < 40:
             return obj.bio
         return f'{obj.bio[:36]}...'
 
-    @staticmethod
-    def full_name(obj):
-        return str(obj)
-
     thumbnail.short_description = 'Фото'
     shorten_bio.short_description = 'Биография'
-    full_name.short_description = 'ФИО'
 
-    list_display = ['thumbnail', 'full_name', 'short_bio', 'shorten_bio']
-    list_display_links = ['full_name']
-    search_fields = ['first_name', 'last_name', 'short_bio', 'bio']
-
-    class Meta:
-        model = Teacher
+    list_display = ['thumbnail', 'user']
+    list_display_links = ['user']
 
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
 
-    @staticmethod
-    def thumbnail(obj: Student):
-        return format_html(f'<img src="{obj.photo.url}" width="100" />')
-
-    @staticmethod
-    def full_name(obj):
-        return str(obj)
+    def thumbnail(self, obj: Student):
+        return format_html(f'<img src="{obj.user.photo.url}" width="100" />')
 
     thumbnail.short_description = 'Фото'
-    full_name.short_description = 'ФИО'
 
-    list_display = ['thumbnail', 'full_name', 'birthday', 'email', 'phone']
-    list_display_links = ['full_name']
-    search_fields = ['full_name', 'birthday', 'email', 'phone']
-
-    class Meta:
-        model = Student
+    list_display = ['thumbnail', 'user']
+    list_display_links = ['user']
 
 
 @admin.register(Review)
@@ -61,15 +41,11 @@ class ReviewAdmin(admin.ModelAdmin):
     list_display_links = ['student']
     search_fields = ['student', 'rating', 'text']
 
-    class Meta:
-        model = Review
-
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
 
-    @staticmethod
-    def shorten_description(obj: Course):
+    def shorten_description(self, obj: Course):
         if len(obj.description) < 40:
             return obj.description
         return f'{obj.description[:36]}...'
@@ -80,9 +56,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display_links = ['name']
     search_fields = ['name', 'duration', 'shorten_description']
     filter_horizontal = ['teachers', 'reviews']
-
-    class Meta:
-        model = Course
+    prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(Schedule)
@@ -91,6 +65,10 @@ class ScheduleAdmin(admin.ModelAdmin):
     list_display_links = ['course']
     search_fields = ['course', 'start_date', 'end_date']
     filter_horizontal = ['students']
+    prepopulated_fields = {'slug': ('course',)}
 
-    class Meta:
-        model = Schedule
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    form = CategoryFormAdmin
+    prepopulated_fields = {'slug': ('name',)}

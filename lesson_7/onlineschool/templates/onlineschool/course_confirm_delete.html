@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Удалить курс {{ object.name }}{% endblock %}
+
+{% block content %}
+
+    <div class="container my-5">
+        <h1 class="text-center">Удалить курс</h1>
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <p>Вы уверены, что хотите удалить курс "{{ object }}"?</p>
+                    {{ form }}
+                    <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i>  Да, удалить
+                    </button>
+                </form>
+                <a href="{% url 'onlineschool:course_detail' course_slug=object.slug %}" class="btn btn-primary mt-1">
+                    <i class="fa-solid fa-arrow-left"></i>  Назад
+                </a>
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </div>
+
+{% endblock %}

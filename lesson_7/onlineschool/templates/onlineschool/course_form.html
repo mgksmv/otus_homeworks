@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить курс{% endblock %}
+
+{% block content %}
+
+    <div class="container my-5">
+        <h1 class="text-center">Добавить курс</h1>
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <div class="container mt-5">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        {{ form.media }}
+                        <input type="submit" value="Добавить" class="btn btn-primary">
+                    </form>
+                </div>
+            </div>
+            <div class="col-2"></div>
+        </div>
+    </div>
+
+{% endblock %}

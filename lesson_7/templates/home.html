@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <h1 class="text-center">Добро пожаловать на образовательную платформу!</h1>
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <h4 class="mt-4">Все категории:</h4>
+                <a href="{% url 'onlineschool:courses' %}" class="btn btn-outline-dark my-1">
+                    Все
+                </a><br>
+                {% for category in object_list %}
+                    <a href="{% url 'onlineschool:course_by_category' category_slug=category.slug %}"
+                       class="btn btn-outline-light my-1"
+                       style="color: #1b1b1b; border-color: {{ category.color }};">
+                        {{ category.name }}
+                    </a>
+                    {% if request.user.user_type == '1' %}
+                        <a href="{% url 'onlineschool:update_category' category_slug=category.slug %}"
+                           class="badge bg-success" style="text-decoration: none;" >
+                            Редактировать
+                        </a>
+                        <a href="{% url 'onlineschool:delete_category' category_slug=category.slug %}"
+                           class="badge bg-danger" style="text-decoration: none;" >
+                            Удалить
+                        </a>
+                    {% endif %}
+                    <br>
+                {% endfor %}
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Расписание курсов{% endblock %}
+
+{% block content %}
+
+    <div class="container my-5">
+        <div class="row">
+            <h1 class="text-center">Расписание курсов</h1>
+            <div class="col-2"></div>
+            <div class="col-8">
+                {% for schedule in object_list %}
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="{{ schedule.course.photo.url }}" class="img-fluid rounded-start" alt="...">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ schedule.course.name }}</h5>
+                                    <p class="card-text mb-0">
+                                        <i class="fa-solid fa-arrow-rotate-right"></i>
+                                        Длительность - {{ schedule.course.duration }} месяцев
+                                    </p>
+                                    {% if not schedule.is_announced_later %}
+                                        <p class="card-text mb-0">
+                                            <i class="fa-solid fa-calendar-days"></i>
+                                            {{ schedule.start_date }} - {{ schedule.end_date }}
+                                        </p>
+                                    {% else %}
+                                        <p class="card-text mb-0">
+                                            <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено
+                                            позже
+                                        </p>
+                                    {% endif %}
+                                    <br>
+                                    <p class="card-text mb-0"><i class="fa-solid fa-users"></i>  Участники:</p>
+                                    {% for student in schedule.students.all %}
+                                        <p class="card-text mb-0">{{ student.user.get_full_name }}</p>
+                                    {% endfor %}
+                                    <a href="{% url 'onlineschool:course_detail' course_slug=schedule.course.slug %}"
+                                       class="btn btn-primary mt-3">
+                                        Подробнее
+                                    </a>
+                                    <a href="{% url 'onlineschool:update_group' group_slug=schedule.slug %}"
+                                       class="btn btn-success mt-3">
+                                        <i class="fa-solid fa-pen-to-square"></i>  Редактировать группу
+                                    </a>
+                                    <a href="{% url 'onlineschool:delete_group' group_slug=schedule.slug %}"
+                                       class="btn btn-danger mt-3">
+                                        <i class="fa-solid fa-trash-can"></i>  Удалить группу
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-2"></div>
+        </div>
+        {% include 'includes/paginator.html' %}
+    </div>
+
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.name }}{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-7">
+                <div class="my-5">
+                    <h1>{{ object.name }}
+                        {% if request.user.user_type == '1' %}
+                            <a href="{% url 'onlineschool:update_course' course_slug=object.slug %}"
+                               class="btn btn-success">
+                                <i class="fa-solid fa-pen-to-square"></i>  Редактировать
+                            </a>
+                            <a href="{% url 'onlineschool:delete_course' course_slug=object.slug %}" class="btn btn-danger">
+                                <i class="fa-solid fa-trash-can"></i>  Удалить
+                            </a>
+                        {% endif %}
+                    </h1>
+                    {% if object.short_description %}
+                        <p>{{ object.short_description|safe }}</p>
+                    {% endif %}
+                    <h5>Ближайшая группа:</h5>
+                    {% for group in object.schedule_set.all %}
+                        {% if forloop.first %}
+                            {% if not group.is_announced_later %}
+                                <p class="card-text">
+                                    <i class="fa-solid fa-calendar-days"></i> с {{ group.start_date }}
+                                </p>
+                                <a href="#" class="btn btn-primary">Записаться</a>
+                            {% else %}
+                                <p class="card-text">
+                                    <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже
+                                </p>
+                                <a href="#" class="btn btn-primary">Сообщить о старте набора</a>
+                            {% endif %}
+                        {% endif %}
+                    {% empty %}
+                        <p class="card-text">
+                            <i class="fa-solid fa-calendar-days"></i> в ближайшее время не планируется
+                        </p>
+                        <a href="#" class="btn btn-primary">Сообщить о старте набора</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-3">
+                <img src="{{ object.photo.url }}" alt="..." height="70%" width="auto">
+            </div>
+        </div>
+    </div>
+    <div class="py-5" style="background-color: #F8F9FA">
+        <div class="container">
+            <h3 class="text-center">Описание курса:</h3>
+            <p>{{ object.description|safe }}</p>
+        </div>
+    </div>
+    <div class="container py-5">
+        <h3 class="text-center">Преподаватели:</h3>
+        {% for teacher in object.teachers.all %}
+            <div class="row py-2">
+                <div class="col-3">
+                    <img src="{{ teacher.user.photo.url }}" alt="" width="70%" height="auto">
+                </div>
+                <div class="col-7">
+                    <h5>{{ teacher.user.get_full_name }}</h5>
+                    <p>{{ teacher.bio|safe }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="py-5" style="background-color: #F8F9FA">
+        <div class="container">
+            <div class="row">
+                <div class="col-6">
+                    <h3 class="text-center">Необходимые знания:</h3>
+                    <p>{{ object.required_knowledge|safe }}</p>
+                </div>
+                <div class="col-6">
+                    <h3 class="text-center">После обучения:</h3>
+                    <p>{{ object.after_course|safe }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="py-5" style="background-color: #7effc5">
+        <div class="container">
+            <div class="row">
+                <div class="col-4">
+                    <p>Стоимость обучения</p>
+                    <h4>{{ course.price }}₽</h4>
+                </div>
+                <div class="col-4">
+                    <p>Продолжительность</p>
+                    <h4>{{ course.duration }} месяцев</h4>
+                    {% for group in object.schedule_set.all %}
+                        {% if forloop.first %}
+                            <p>Начало занятий</p>
+                            <h4>{{ group.start_date }}</h4>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="col-4">
+                    <a href="#" class="btn btn-primary btn-lg">Записаться</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

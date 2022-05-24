@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Все курсы{% endblock %}
+
+{% block content %}
+
+    <div class="container my-5">
+        <div class="row">
+            <h1 class="text-center">Все курсы</h1>
+            {% for course in object_list %}
+                <div class="card m-2" style="width: 18rem;">
+                    <img src="{{ course.photo.url }}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <span class="badge" style="background-color: {{ course.category.color }};">
+                            {{ course.category.name }}
+                        </span>
+                        <h5 class="card-title my-3">{{ course.name }}</h5>
+                        <p class="card-text mb-0">
+                            <i class="fa-solid fa-arrow-rotate-right"></i> Длительность - {{ course.duration }} мес.
+                        </p>
+                        {% for schedule in course.schedule_set.all %}
+                            {% if forloop.first %}
+                                {% if not schedule.is_announced_later %}
+                                    <p class="card-text mb-0">
+                                        <i class="fa-solid fa-calendar-days"></i> с {{ schedule.start_date }}
+                                    </p>
+                                {% else %}
+                                    <p class="card-text mb-0">
+                                        <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже
+                                    </p>
+                                {% endif %}
+                            {% endif %}
+                        {% empty %}
+                            <p class="card-text mb-0">
+                                <i class="fa-solid fa-calendar-days"></i> в ближайшее время не планируется
+                            </p>
+                        {% endfor %}
+                        <a href="{% url 'onlineschool:course_detail' course_slug=course.slug %}"
+                           class="btn btn-primary mt-3">
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% include 'includes/paginator.html' %}
+    </div>
+
+{% endblock %}
