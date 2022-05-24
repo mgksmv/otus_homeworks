@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.utils.html import format_html
 
 from .models import User
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 CustomUser = get_user_model()
 
@@ -20,6 +20,9 @@ class UserAdmin(UserAdmin):
         return str(obj)
 
     add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = User
+
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
@@ -44,8 +47,8 @@ class UserAdmin(UserAdmin):
     thumbnail.short_description = 'Фото'
     full_name.short_description = 'ФИО'
 
-    list_display = ('thumbnail', 'full_name', 'birthday')
-    list_display_links = ('thumbnail', 'full_name')
+    list_display = ('thumbnail', 'email', 'full_name', 'birthday')
+    list_display_links = ('thumbnail', 'email')
     search_fields = ('first_name', 'last_name')
 
     ordering = ('email',)
@@ -53,9 +56,6 @@ class UserAdmin(UserAdmin):
     filter_horizontal = ()
     list_filter = ()
     fieldsets = ()
-
-    class Meta:
-        model = User
 
 
 admin.site.unregister(Group)

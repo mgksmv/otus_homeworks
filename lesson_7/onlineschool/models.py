@@ -1,10 +1,15 @@
 from django.core.exceptions import ValidationError
-from django.db import models, IntegrityError
+from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from ckeditor_uploader.fields import RichTextUploadingField
 
 from slugify import slugify
+
+User = get_user_model()
 
 
 class Teacher(models.Model):
@@ -28,11 +33,8 @@ class Teacher(models.Model):
 
 class Student(models.Model):
     user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, verbose_name='Пользователь', unique=True)
-    courses = models.ManyToManyField(
-        'Course', verbose_name='Мои курсы', related_name='student_courses', blank=True, null=True
-    )
     wishlist = models.ManyToManyField(
-        'Course', verbose_name='Список желаемого', related_name='student_wishlist', blank=True, null=True
+        'Course', verbose_name='Список желаемого', related_name='student_wishlist', blank=True
     )
 
     class Meta:
@@ -47,6 +49,16 @@ class Student(models.Model):
         if teacher_exists:
             raise ValidationError('Уже существует преподаватель с этим профилем')
         super().save(*args, **kwargs)
+
+
+# Auto create Teacher or Student (one to one) after User was created
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        if instance.user_type == '1':
+            Teacher.objects.create(user=instance)
+        else:
+            Student.objects.create(user=instance)
 
 
 class Review(models.Model):

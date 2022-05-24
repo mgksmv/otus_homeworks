@@ -44,35 +44,64 @@
                         <a class="nav-link active" aria-current="page" href="{% url 'onlineschool:courses' %}">Все
                             курсы</a>
                     </li>
-                    {% if request.user.user_type == '1' %}
+                    {% if user.is_authenticated %}
+                        {% if request.user.user_type == '1' %}
+                            <li class="nav-item dropdown">
+                                <a class="btn btn-secondary dropdown-toggle button-margin" href="#" role="button" id="dropdown_1"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-chalkboard-user"></i>  Для преподавателей
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="dropdown_1">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'onlineschool:create_course' %}">
+                                            Добавить курс
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'onlineschool:create_category' %}">
+                                            Добавить категорию
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'onlineschool:create_group' %}">
+                                            Создать курс с группой
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'onlineschool:schedule' %}">
+                                            Расписание
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
                         <li class="nav-item dropdown">
-                            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdown_2"
                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fa-solid fa-chalkboard-user"></i>  Для преподавателей
+                                <i class="fa-solid fa-user"></i>  {{ user.email }}
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <ul class="dropdown-menu" aria-labelledby="dropdown_2">
+                                {% if user.user_type == '2' %}
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'onlineschool:student_courses' %}">
+                                            Мои курсы
+                                        </a>
+                                    </li>
+                                {% endif %}
                                 <li>
-                                    <a class="dropdown-item" href="{% url 'onlineschool:create_course' %}">
-                                        Добавить курс
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'onlineschool:create_category' %}">
-                                        Добавить категорию
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'onlineschool:create_group' %}">
-                                        Создать курс с группой
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'onlineschool:schedule' %}">
-                                        Расписание
+                                    <a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                                        Выйти
                                     </a>
                                 </li>
                             </ul>
                         </li>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-primary button-margin">
+                            <i class="fa-solid fa-right-to-bracket"></i>  Войти
+                        </a>
+                        <a href="{% url 'accounts:signup' %}" class="btn btn-success">
+                            <i class="fa-solid fa-user-plus"></i>  Зарегистрироваться
+                        </a>
                     {% endif %}
                 </ul>
                 <form method="get" action="{% url 'onlineschool:search' %}" class="d-flex">

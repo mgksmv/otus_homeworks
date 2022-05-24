@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои курсы{% endblock %}
+
+{% block content %}
+
+    <div class="container my-5">
+        <div class="row">
+            <h1 class="text-center">Мои курсы</h1>
+            <div class="col-2"></div>
+            <div class="col-8">
+                {% for student_course in object_list %}
+                    <div class="card mb-3">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="{{ student_course.course.photo.url }}" class="img-fluid rounded-start"
+                                     alt="...">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ student_course.course.name }}</h5>
+                                    <p class="card-text mb-0">
+                                        <i class="fa-solid fa-arrow-rotate-right"></i>
+                                        Длительность - {{ student_course.course.duration }} месяцев
+                                    </p>
+                                    {% if not student_course.is_announced_later %}
+                                        <p class="card-text mb-0">
+                                            <i class="fa-solid fa-calendar-days"></i>
+                                            {{ student_course.start_date }} - {{ student_course.end_date }}
+                                        </p>
+                                    {% else %}
+                                        <p class="card-text mb-0">
+                                            <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено
+                                            позже
+                                        </p>
+                                    {% endif %}
+                                    <br>
+                                    <p class="card-text mb-0"><i class="fa-solid fa-users"></i>  Участники:</p>
+                                    {% for student in student_course.students.all %}
+                                        {% if student.user.id == request.user.id %}
+                                            <p class="card-text mb-0"><b>{{ student.user.get_full_name }}</b> (Вы)</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for student in student_course.students.all %}
+                                        {% if student.user.id != request.user.id %}
+                                            <p class="card-text mb-0">{{ student.user.get_full_name }}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-center">
+                        <h5>Вы не записались ни на один курс</h5>
+                        <a href="{% url 'home' %}" class="btn btn-primary">На главную</a>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="col-2"></div>
+        </div>
+        {% include 'includes/paginator.html' %}
+    </div>
+
+{% endblock %}

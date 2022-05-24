@@ -21,7 +21,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     date_joined = models.DateTimeField('Дата регистрации', auto_now_add=True)
     last_login = models.DateTimeField('Последний вход', auto_now_add=True)
-    is_active = models.BooleanField('Активный', default=False)
+    is_active = models.BooleanField('Активный', default=True)
     is_admin = models.BooleanField('Админ', default=False)
     is_staff = models.BooleanField('Статус персонала', default=False)
     is_superuser = models.BooleanField('Статус суперпользователя', default=False)
@@ -36,7 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'Аккаунты'
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.id} {self.first_name} {self.last_name}'
 
     def get_full_name(self):
         return str(self)

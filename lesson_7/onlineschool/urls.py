@@ -17,6 +17,7 @@ urlpatterns = [
     path('create-group/', views.GroupCreateView.as_view(), name='create_group'),
     path('update-group/<slug:group_slug>/', views.GroupUpdateView.as_view(), name='update_group'),
     path('delete-group/<slug:group_slug>/', views.GroupDeleteView.as_view(), name='delete_group'),
+    path('my-courses/', views.StudentCoursesListView.as_view(), name='student_courses'),
     path('<slug:course_slug>/', views.CourseDetailView.as_view(), name='course_detail'),
     path('category/<slug:category_slug>/', views.CourseByCategoryListView.as_view(), name='course_by_category'),
 ]

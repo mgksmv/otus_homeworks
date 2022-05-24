@@ -38,6 +38,11 @@
                         </a>
                     </div>
                 </div>
+            {% empty %}
+                <div class="text-center">
+                    <h5>Тут пока пусто</h5>
+                    <a href="{% url 'home' %}" class="btn btn-primary">На главную</a>
+                </div>
             {% endfor %}
         </div>
         {% include 'includes/paginator.html' %}

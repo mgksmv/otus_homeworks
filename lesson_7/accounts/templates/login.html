@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Войти{% endblock title %}
+
+{% block content %}
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <h1>Войти</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    {% if form.email.errors %}
+                        <div class="alert alert-danger">
+                            {{ form.email.errors }}
+                        </div>
+                    {% endif %}
+                    {{ form.as_p }}
+                    <input type="submit" value="Войти" class="btn btn-primary">
+                </form>
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </div>
+{% endblock content %}

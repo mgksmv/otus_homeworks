@@ -1,11 +1,13 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth import get_user_model
 
-from .models import Course, Category, Schedule
+from .models import Course, Category, Schedule, Student
 from .forms import CourseForm, CategoryForm, ScheduleForm
 from .mixins import RedirectToPreviousPageMixin, PaginatorMixin, CheckUserIsTeacher
+
+User = get_user_model()
 
 
 class HomeTemplateView(ListView):
@@ -113,3 +115,12 @@ class SearchCourseListView(PaginatorMixin, ListView):
         if query:
             object_list = self.model.objects.filter(name__icontains=query)
         return object_list
+
+
+class StudentCoursesListView(ListView):
+    model = Schedule
+    template_name = 'onlineschool/student_courses.html'
+
+    def get_queryset(self):
+        student = Student.objects.get(user=self.request.user)
+        return Schedule.objects.filter(students=student)
