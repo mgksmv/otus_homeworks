@@ -1,20 +1,19 @@
-from flask import Blueprint, request, render_template, abort, url_for, redirect, flash
+from flask import Blueprint, request, render_template, abort, url_for, redirect, flash, current_app
 from flask_login import current_user, login_user, logout_user, login_required
 from flask_mail import Mail, Message
 from threading import Thread
 from itsdangerous import URLSafeTimedSerializer
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from lesson_5 import app
 from lesson_5.forms import SingUpForm, LoginForm, EditUserForm, ResetEmailForm, ResetPasswordForm
 from lesson_5.models import db, User, Blog
 
 accounts_app = Blueprint('accounts_app', __name__)
-mail = Mail(app)
+mail = Mail(current_app)
 
 
 def send_email_thread(msg):
-    with app.app_context():
+    with current_app.app_context():
         mail.send(msg)
 
 
@@ -26,7 +25,7 @@ def send_email(subject, recipients, html_body):
 
 
 def send_password_reset_link(user_email):
-    password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    password_reset_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
 
     password_reset_url = url_for(
         'accounts_app.token_reset',
@@ -60,7 +59,7 @@ def reset_email():
 @accounts_app.route('/reset/<token>', methods=['GET', 'POST'])
 def token_reset(token):
     try:
-        password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        password_reset_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
         email = password_reset_serializer.loads(token, salt='password-reset-salt', max_age=3600)
     except:
         flash('The password reset link is invalid or has expired.', category='danger')
