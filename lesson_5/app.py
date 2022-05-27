@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from werkzeug.security import generate_password_hash
 from decouple import config
 
+from lesson_5.mail import mail
 from lesson_5.models import db, User, migrate
 from lesson_5.views import accounts_app, blogs_app, main_app
 
@@ -41,6 +42,7 @@ def create_app():
 
         db.init_app(app)
         migrate.init_app(app, db)
+        mail.init_app(app)
 
         create_commands(app)
 
