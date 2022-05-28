@@ -1,4 +1,3 @@
-import os
 import click
 from flask import Flask
 from flask_login import LoginManager, current_user
@@ -22,16 +21,16 @@ def create_app():
 
     with app.app_context():
         app.config.update(
-            ENV=os.getenv('ENV'),
-            SECRET_KEY=os.getenv('SECRET_KEY'),
-            SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI'),
-            MAIL_SERVER=os.getenv('MAIL_SERVER'),
-            MAIL_PORT=os.getenv('MAIL_PORT'),
-            MAIL_USE_TLS=os.getenv('MAIL_USE_TLS'),
-            MAIL_USE_SSL=os.getenv('MAIL_USE_SSL'),
-            MAIL_USERNAME=os.getenv('MAIL_USERNAME'),
-            MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),
-            MAIL_DEFAULT_SENDER=os.getenv('MAIL_DEFAULT_SENDER'),
+            ENV=config('ENV'),
+            SECRET_KEY=config('SECRET_KEY'),
+            SQLALCHEMY_DATABASE_URI=config('SQLALCHEMY_DATABASE_URI'),
+            MAIL_SERVER=config('MAIL_SERVER'),
+            MAIL_PORT=config('MAIL_PORT'),
+            MAIL_USE_TLS=config('MAIL_USE_TLS'),
+            MAIL_USE_SSL=config('MAIL_USE_SSL'),
+            MAIL_USERNAME=config('MAIL_USERNAME'),
+            MAIL_PASSWORD=config('MAIL_PASSWORD'),
+            MAIL_DEFAULT_SENDER=config('MAIL_DEFAULT_SENDER'),
         )
 
         app.register_blueprint(accounts_app)
