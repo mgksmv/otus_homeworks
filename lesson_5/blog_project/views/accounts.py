@@ -1,28 +1,21 @@
 from flask import Blueprint, request, render_template, abort, url_for, redirect, flash, current_app
 from flask_login import current_user, login_user, logout_user, login_required
 from flask_mail import Message
-from threading import Thread
 from itsdangerous import URLSafeTimedSerializer
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from ..mail import mail
 from ..forms import SingUpForm, LoginForm, EditUserForm, ResetEmailForm, ResetPasswordForm
 from ..models import db, User, Blog
-from ..mail import mail
 
 accounts_app = Blueprint('accounts_app', __name__)
-
-
-def send_email_thread(msg):
-    with current_app.app_context():
-        mail.send(msg)
 
 
 def send_email(subject, recipients, html_body):
     with current_app.app_context():
         msg = Message(subject, recipients=recipients)
         msg.html = html_body
-        thr = Thread(target=send_email_thread, args=[msg])
-        thr.start()
+        mail.send(msg)
 
 
 def send_password_reset_link(user_email):

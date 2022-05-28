@@ -1,10 +1,7 @@
 from datetime import datetime
-from sqlalchemy.orm import relationship, declarative_base
 from flask_login import UserMixin
 
 from .database import db
-
-Base = declarative_base()
 
 bookmarks = db.Table('bookmarks',
                      db.Column('blog_id', db.Integer, db.ForeignKey('blogs.id')),
@@ -27,7 +24,7 @@ class User(UserMixin, db.Model):
     bio = db.Column(db.String(255))
     email = db.Column(db.String(32), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    bookmarks = relationship('Blog', secondary=bookmarks)
+    bookmarks = db.relationship('Blog', secondary=bookmarks)
     is_admin = db.Column(db.Boolean(), default=False, nullable=False)
     created_at = db.Column(db.DateTime(), default=datetime.now, nullable=False)
 
@@ -58,13 +55,13 @@ class Blog(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     text = db.Column(db.Text(), nullable=False)
-    tags = relationship('Tag', secondary=blog_tags)
+    tags = db.relationship('Tag', secondary=blog_tags)
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime(), default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, nullable=False)
 
-    user = relationship('User', backref='posts')
-    comments = relationship('Comment', backref='comments')
+    user = db.relationship('User', backref='posts')
+    comments = db.relationship('Comment', backref='comments')
 
     def __str__(self):
         return self.title
@@ -83,7 +80,7 @@ class Comment(db.Model):
     created_at = db.Column(db.DateTime(), default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime(), default=datetime.now, onupdate=datetime.now, nullable=False)
 
-    user = relationship('User', backref='comments')
+    user = db.relationship('User', backref='comments')
 
     def __str__(self):
         return self.text

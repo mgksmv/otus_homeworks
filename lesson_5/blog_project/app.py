@@ -1,3 +1,4 @@
+import os
 import click
 from flask import Flask
 from flask_login import LoginManager, current_user
@@ -6,9 +7,14 @@ from flask_bcrypt import Bcrypt
 from werkzeug.security import generate_password_hash
 from decouple import config
 
-from lesson_5.mail import mail
-from lesson_5.models import db, User, migrate
-from lesson_5.views import accounts_app, blogs_app, main_app
+try:
+    from lesson_5.blog_project.mail import mail
+    from lesson_5.blog_project.models import db, User, migrate
+    from lesson_5.blog_project.views import accounts_app, blogs_app, main_app
+except ImportError:
+    from blog_project.mail import mail
+    from blog_project.models import db, User, migrate
+    from blog_project.views import accounts_app, blogs_app, main_app
 
 
 def create_app():
@@ -16,16 +22,16 @@ def create_app():
 
     with app.app_context():
         app.config.update(
-            ENV=config('ENV'),
-            SECRET_KEY=config('SECRET_KEY'),
-            SQLALCHEMY_DATABASE_URI=config('SQLALCHEMY_DATABASE_URI'),
-            MAIL_SERVER=config('MAIL_SERVER'),
-            MAIL_PORT=config('MAIL_PORT'),
-            MAIL_USE_TLS=config('MAIL_USE_TLS'),
-            MAIL_USE_SSL=config('MAIL_USE_SSL'),
-            MAIL_USERNAME=config('MAIL_USERNAME'),
-            MAIL_PASSWORD=config('MAIL_PASSWORD'),
-            MAIL_DEFAULT_SENDER=config('MAIL_DEFAULT_SENDER'),
+            ENV=os.getenv('ENV'),
+            SECRET_KEY=os.getenv('SECRET_KEY'),
+            SQLALCHEMY_DATABASE_URI=os.getenv('SQLALCHEMY_DATABASE_URI'),
+            MAIL_SERVER=os.getenv('MAIL_SERVER'),
+            MAIL_PORT=os.getenv('MAIL_PORT'),
+            MAIL_USE_TLS=os.getenv('MAIL_USE_TLS'),
+            MAIL_USE_SSL=os.getenv('MAIL_USE_SSL'),
+            MAIL_USERNAME=os.getenv('MAIL_USERNAME'),
+            MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),
+            MAIL_DEFAULT_SENDER=os.getenv('MAIL_DEFAULT_SENDER'),
         )
 
         app.register_blueprint(accounts_app)
@@ -58,10 +64,25 @@ def create_app():
 
 
 def create_commands(app):
+    def validate_username(ctx, param, value):
+        if len(value) < 6:
+            raise click.BadParameter('Username must contain at least 6 characters!')
+        return value
+
+    def validate_email(ctx, param, value):
+        if '@' not in value:
+            raise click.BadParameter('Email must contain @ symbol!')
+        return value
+
+    def validate_password(ctx, param, value):
+        if len(value) < 6:
+            raise click.BadParameter('Password must contain at least 6 characters!')
+        return value
+
     @app.cli.command('createsuperuser', help='Create a super user.')
-    @click.option('--username')
-    @click.option('--email')
-    @click.option('--password')
+    @click.option('--username', callback=validate_username)
+    @click.option('--email', callback=validate_email)
+    @click.option('--password', callback=validate_password)
     def create_super_user(username, email, password):
         print('Creating a super user...')
         hash_and_salted_password = generate_password_hash(
@@ -77,4 +98,4 @@ def create_commands(app):
 
 if __name__ == '__main__':
     application = create_app()
-    application.run(debug=True)
+    application.run(debug=True, host='0.0.0.0')

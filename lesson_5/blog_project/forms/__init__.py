@@ -6,7 +6,7 @@ __all__ = (
     'EditUserForm',
     'ResetEmailForm',
     'ResetPasswordForm',
-    'TagForm'
+    'TagForm',
 )
 
 from .blogs import CommentForm, BlogForm, TagForm

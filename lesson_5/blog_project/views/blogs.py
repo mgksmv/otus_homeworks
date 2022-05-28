@@ -3,8 +3,8 @@ from functools import wraps
 from flask import Blueprint, request, render_template, abort, url_for, redirect, flash
 from flask_login import login_required, current_user
 
-from lesson_5.models import db, Blog, User, Comment, Tag
-from lesson_5.forms import CommentForm, BlogForm, TagForm
+from ..models import db, Blog, User, Comment, Tag
+from ..forms import CommentForm, BlogForm, TagForm
 
 blogs_app = Blueprint('blogs_app', __name__)
 
