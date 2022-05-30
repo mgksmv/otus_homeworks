@@ -76,12 +76,12 @@ def create_commands(app):
             form = CreateSuperUserForm(
                 data={'username': username, 'email': email, 'password': password, 'csrf_token': csrf.generate_csrf()}
             )
-            hash_and_salted_password = generate_password_hash(
-                password,
-                method='pbkdf2:sha256',
-                salt_length=8,
-            )
             if form.validate():
+                hash_and_salted_password = generate_password_hash(
+                    password,
+                    method='pbkdf2:sha256',
+                    salt_length=8,
+                )
                 new_user = User(username=username, email=email, password=hash_and_salted_password, is_admin=True)
                 db.session.add(new_user)
                 db.session.commit()
