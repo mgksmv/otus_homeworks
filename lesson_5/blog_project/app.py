@@ -1,8 +1,9 @@
 import click
-from flask import Flask
+from flask import Flask, current_app
 from flask_login import LoginManager, current_user
 from flask_ckeditor import CKEditor
 from flask_bcrypt import Bcrypt
+from flask_wtf import csrf
 from werkzeug.security import generate_password_hash
 from decouple import config
 
@@ -10,10 +11,12 @@ try:
     from lesson_5.blog_project.mail import mail
     from lesson_5.blog_project.models import db, User, migrate
     from lesson_5.blog_project.views import accounts_app, blogs_app, main_app
+    from lesson_5.blog_project.forms import CreateSuperUserForm
 except ImportError:
     from blog_project.mail import mail
     from blog_project.models import db, User, migrate
     from blog_project.views import accounts_app, blogs_app, main_app
+    from blog_project.forms import CreateSuperUserForm
 
 
 def create_app():
@@ -63,36 +66,30 @@ def create_app():
 
 
 def create_commands(app):
-    def validate_username(ctx, param, value):
-        if len(value) < 6:
-            raise click.BadParameter('Username must contain at least 6 characters!')
-        return value
-
-    def validate_email(ctx, param, value):
-        if '@' not in value:
-            raise click.BadParameter('Email must contain @ symbol!')
-        return value
-
-    def validate_password(ctx, param, value):
-        if len(value) < 6:
-            raise click.BadParameter('Password must contain at least 6 characters!')
-        return value
-
     @app.cli.command('createsuperuser', help='Create a super user.')
-    @click.option('--username', callback=validate_username)
-    @click.option('--email', callback=validate_email)
-    @click.option('--password', callback=validate_password)
+    @click.option('--username')
+    @click.option('--email')
+    @click.option('--password')
     def create_super_user(username, email, password):
         print('Creating a super user...')
-        hash_and_salted_password = generate_password_hash(
-            password,
-            method='pbkdf2:sha256',
-            salt_length=8,
-        )
-        new_user = User(username=username, email=email, password=hash_and_salted_password, is_admin=True)
-        db.session.add(new_user)
-        db.session.commit()
-        print('Done!')
+        with current_app.test_request_context():
+            form = CreateSuperUserForm(
+                data={'username': username, 'email': email, 'password': password, 'csrf_token': csrf.generate_csrf()}
+            )
+            hash_and_salted_password = generate_password_hash(
+                password,
+                method='pbkdf2:sha256',
+                salt_length=8,
+            )
+            if form.validate():
+                new_user = User(username=username, email=email, password=hash_and_salted_password, is_admin=True)
+                db.session.add(new_user)
+                db.session.commit()
+                print('Done!')
+            else:
+                for field, errors in form.errors.items():
+                    all_errors = ' '.join(error for error in errors)
+                    print(f'Error: {field} - {all_errors}')
 
 
 if __name__ == '__main__':

@@ -33,3 +33,9 @@ class ResetEmailForm(FlaskForm):
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
+
+
+class CreateSuperUserForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(6, 32)])
+    email = EmailField('Email', validators=[DataRequired(), Length(6, 32)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(6, 32)])
