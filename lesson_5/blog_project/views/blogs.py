@@ -188,7 +188,6 @@ def delete_tag(tag_id):
 @login_required
 def add_bookmark(blog_id):
     blog = Blog.query.filter_by(id=blog_id).first_or_404()
-    # current_user.bookmarks += [blog]
     current_user.bookmarks.append(blog)
     db.session.commit()
     flash('The blog has been added to your bookmarks.', category='info')
@@ -203,7 +202,7 @@ def delete_bookmark(blog_id):
     db.session.commit()
     flash('The blog has been removed from your bookmarks.', category='danger')
     if 'bookmarks' in request.referrer:
-        return redirect(url_for('blogs_app.bookmarks'))
+        return redirect(url_for('blogs_app.get_bookmarks'))
     return redirect(url_for('main_app.home'))
 
 
@@ -211,6 +210,4 @@ def delete_bookmark(blog_id):
 @login_required
 def get_bookmarks():
     all_bookmarks = current_user.bookmarks.paginate(per_page=10)
-    bookmarks = current_user.bookmarks
-    print(bookmarks.__class__)
     return render_template('blogs/bookmarks.html', all_bookmarks=all_bookmarks)
