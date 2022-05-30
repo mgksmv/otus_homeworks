@@ -24,7 +24,7 @@ class User(UserMixin, db.Model):
     bio = db.Column(db.String(255))
     email = db.Column(db.String(32), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    bookmarks = db.relationship('Blog', secondary=bookmarks)
+    bookmarks = db.relationship('Blog', secondary=bookmarks, lazy='dynamic')
     is_admin = db.Column(db.Boolean(), default=False, nullable=False)
     created_at = db.Column(db.DateTime(), default=datetime.now, nullable=False)
 

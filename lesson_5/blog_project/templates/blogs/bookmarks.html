@@ -13,7 +13,7 @@
                 </div>
                 <h1 class="text-center pt-4 pb-4 text-white">Bookmarks</h1>
                 {% if all_bookmarks %}
-                    {% for blog in all_bookmarks %}
+                    {% for blog in all_bookmarks.items %}
                         <div class="py-2">
                             <div class="card">
                                 <div class="card-header">
@@ -67,39 +67,39 @@
                 {% else %}
                     <p class="text-center text-white">You have not added blogs to bookmarks yet.</p>
                 {% endif %}
-{#                    {% if ????? %}#}
-{#                        <nav>#}
-{#                            <ul class="pagination justify-content-center mt-4">#}
-{#                                {% if all_blogs.has_prev %}#}
-{#                                    <li class="page-item">#}
-{#                                        <a class="page-link"#}
-{#                                           href="{{ url_for('main_app.home', page=all_blogs.prev_num) }}">#}
-{#                                            Previous#}
-{#                                        </a>#}
-{#                                    </li>#}
-{#                                {% else %}#}
-{#                                    <li class="page-item"><a class="page-link btn disabled" href="#">Previous</a></li>#}
-{#                                {% endif %}#}
-{#                                {% for page_num in all_blogs.iter_pages() %}#}
-{#                                    <li class="page-item {% if page_num == all_blogs.page %}active{% endif %}">#}
-{#                                        <a class="page-link" href="{{ url_for('main_app.home', page=page_num) }}">#}
-{#                                            {{ page_num }}#}
-{#                                        </a>#}
-{#                                    </li>#}
-{#                                {% endfor %}#}
-{#                                {% if all_blogs.has_next %}#}
-{#                                    <li class="page-item">#}
-{#                                        <a class="page-link"#}
-{#                                           href="{{ url_for('main_app.home', page=all_blogs.next_num) }}">#}
-{#                                            Next#}
-{#                                        </a>#}
-{#                                    </li>#}
-{#                                {% else %}#}
-{#                                    <li class="page-item"><a class="page-link btn disabled" href="#">Next</a></li>#}
-{#                                {% endif %}#}
-{#                            </ul>#}
-{#                        </nav>#}
-{#                    {% endif %}#}
+                {% if all_bookmarks.pages > 1 %}
+                    <nav>
+                        <ul class="pagination justify-content-center mt-4">
+                            {% if all_bookmarks.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="{{ url_for('blogs_app.get_bookmarks', page=all_bookmarks.prev_num) }}">
+                                        Previous
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link btn disabled" href="#">Previous</a></li>
+                            {% endif %}
+                            {% for page_num in all_bookmarks.iter_pages() %}
+                                <li class="page-item {% if page_num == all_bookmarks.page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('blogs_app.get_bookmarks', page=page_num) }}">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            {% if all_bookmarks.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link"
+                                       href="{{ url_for('blogs_app.get_bookmarks', page=all_bookmarks.next_num) }}">
+                                        Next
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link btn disabled" href="#">Next</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
             </div>
             <div class="col-2"></div>
         </div>
