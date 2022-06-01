@@ -19,18 +19,19 @@ class CourseListView(PaginatorMixin, ListView):
     model = Course
     paginate_by = 8
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['schedule_objects'] = Schedule.objects.all()
-        return context
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('category').prefetch_related('schedule_set')
 
 
 class CourseByCategoryListView(PaginatorMixin, ListView):
+    model = Course
     template_name = 'onlineschool/courses_by_category.html'
     paginate_by = 8
 
     def get_queryset(self):
-        return Course.objects.filter(category__slug=self.kwargs['category_slug'])
+        queryset = super().get_queryset()
+        return queryset.filter(category__slug=self.kwargs['category_slug'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -41,6 +42,9 @@ class CourseByCategoryListView(PaginatorMixin, ListView):
 class CourseDetailView(DetailView):
     model = Course
     slug_url_kwarg = 'course_slug'
+
+    def get_queryset(self):
+        return Course.objects.prefetch_related('schedule_set', 'teachers__user')
 
 
 class CourseCreateView(CheckUserIsTeacher, RedirectToPreviousPageMixin, CreateView):
@@ -111,7 +115,6 @@ class SearchCourseListView(PaginatorMixin, ListView):
     def get_queryset(self):
         object_list = None
         query = self.request.GET.get('keyword')
-        print(query)
         if query:
             object_list = self.model.objects.filter(name__icontains=query)
         return object_list

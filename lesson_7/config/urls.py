@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+from config.settings import DEBUG
 from onlineschool.views import HomeTemplateView
 
 urlpatterns = [
@@ -12,3 +13,6 @@ urlpatterns = [
     path('', HomeTemplateView.as_view(), name='home'),
     path('courses/', include('onlineschool.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if DEBUG:
+    urlpatterns += [path('__debug__/', include('debug_toolbar.urls'))]

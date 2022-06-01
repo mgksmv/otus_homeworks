@@ -2,8 +2,10 @@ asgiref==3.5.2
 backports.zoneinfo==0.2.1
 Django==4.0.4
 django-ckeditor==6.4.0
+django-debug-toolbar==3.4.0
 django-js-asset==2.0.0
 Pillow==9.1.1
+psycopg2==2.9.3
 python-decouple==3.6
 python-slugify==6.1.2
 sqlparse==0.4.2

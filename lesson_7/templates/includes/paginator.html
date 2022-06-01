@@ -1,14 +1,16 @@
+{% load url_tags %}
+
 {% if is_paginated %}
     <nav class="mb-5" aria-label="...">
         <ul class="pagination justify-content-center">
             <li class="page-item">
                 <a class="page-link text-danger"
-                   href="?page=1{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}"
+                   href="?{% relative_url page=1 %}"
                    tabindex="-1">В начало</a>
             </li>
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}"
+                    <a class="page-link" href="?{% relative_url page=page_obj.previous_page_number %}"
                        tabindex="-1">Пред.</a>
                 </li>
             {% else %}
@@ -20,18 +22,18 @@
             {% for n in object_list.paginator.page_range %}
                 {% if object_list.number == n %}
                     <li class="page-item active">
-                        <a class="page-link" href="?page={{ n }}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}">{{ n }}</a>
+                        <a class="page-link" href="?{% relative_url page=n %}">{{ n }}</a>
                     </li>
                 {% elif n > object_list.number|add:-5 and n < object_list.number|add:5 %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ n }}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}">{{ n }}</a>
+                        <a class="page-link" href="?{% relative_url page=n %}">{{ n }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next and page_obj.next_page_number <= object_list.paginator.page_range|length %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}"
+                    <a class="page-link" href="?{% relative_url page=page_obj.next_page_number %}"
                        tabindex="-1">След.</a>
                 </li>
             {% else %}
@@ -41,7 +43,7 @@
             {% endif %}
             <li class="page-item">
                 <a class="page-link text-success"
-                   href="?page={{ object_list.paginator.page_range|length }}{% if request.GET.keyword %}&keyword={{ request.GET.keyword }}{% endif %}"
+                   href="?{% relative_url page=object_list.paginator.page_range|length %}"
                    tabindex="-1">В конец</a>
             </li>
         </ul>
