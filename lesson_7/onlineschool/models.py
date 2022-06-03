@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from ckeditor_uploader.fields import RichTextUploadingField
@@ -13,7 +12,7 @@ User = get_user_model()
 
 
 class Teacher(models.Model):
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, verbose_name='Пользователь', unique=True)
+    user = models.OneToOneField(User, verbose_name='Пользователь', on_delete=models.CASCADE, unique=True)
     short_bio = models.CharField('Короткая биография/специальность', max_length=64)
     bio = RichTextUploadingField('Биография')
 
@@ -32,7 +31,7 @@ class Teacher(models.Model):
 
 
 class Student(models.Model):
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, verbose_name='Пользователь', unique=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Пользователь', unique=True)
     wishlist = models.ManyToManyField(
         'Course', verbose_name='Список желаемого', related_name='student_wishlist', blank=True
     )
@@ -134,7 +133,7 @@ class Course(models.Model):
 
 class Schedule(models.Model):
     course = models.ForeignKey(Course, verbose_name='Курс', on_delete=models.CASCADE)
-    students = models.ManyToManyField(Student, verbose_name='Студенты')
+    students = models.ManyToManyField(Student, verbose_name='Студенты', blank=True)
     start_date = models.DateField('Дата старта курса')
     end_date = models.DateField('Дата окончания курса')
     is_announced_later = models.BooleanField('Не показывать дату начала курса?')
@@ -157,4 +156,31 @@ class Schedule(models.Model):
         ordering = ('is_announced_later', 'start_date')
 
     def __str__(self):
-        return str(self.course)
+        return f'{self.course} - {self.start_date}'
+
+
+class RegistrationBase(models.Model):
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE, blank=True, null=True)
+    email = models.EmailField('Почта', max_length=32)
+    course = models.ForeignKey(Course, verbose_name='Курс', on_delete=models.CASCADE)
+    date_created = models.DateField('Дата создания', auto_now_add=True)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return str(self.email)
+
+
+class RegistrationRequest(RegistrationBase):
+    course = models.ForeignKey(Schedule, verbose_name='Курс (ближайший)', on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = 'заявка на запись'
+        verbose_name_plural = 'Заявки на запись'
+
+
+class CourseRequest(RegistrationBase):
+    class Meta:
+        verbose_name = 'заявка о старте набора'
+        verbose_name_plural = 'Заявки о старте набора'

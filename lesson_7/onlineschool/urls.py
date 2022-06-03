@@ -20,4 +20,7 @@ urlpatterns = [
     path('my-courses/', views.StudentCoursesListView.as_view(), name='student_courses'),
     path('<slug:course_slug>/', views.CourseDetailView.as_view(), name='course_detail'),
     path('category/<slug:category_slug>/', views.CourseByCategoryListView.as_view(), name='course_by_category'),
+    path('registration-requests/', views.RegistrationRequestListView.as_view(), name='registration_requests'),
+    path('<slug:schedule_slug>/register/', views.register_registration_request, name='register_registration_request'),
+    path('<slug:course_slug>/course-request/', views.register_course_request, name='register_course_request'),
 ]

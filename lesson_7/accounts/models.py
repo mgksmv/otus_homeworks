@@ -36,7 +36,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'Аккаунты'
 
     def __str__(self):
-        return f'{self.id} {self.first_name} {self.last_name}'
+        if not self.first_name or not self.last_name:
+            return f'{self.id}'
+        return f'{self.first_name} {self.last_name}'
 
     def get_full_name(self):
         return str(self)

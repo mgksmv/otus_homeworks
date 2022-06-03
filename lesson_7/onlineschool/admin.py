@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Teacher, Student, Review, Course, Schedule, Category
+from .models import Teacher, Student, Review, Course, Schedule, Category, RegistrationRequest, CourseRequest
 from .forms import CategoryFormAdmin
 
 
@@ -72,3 +72,17 @@ class ScheduleAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     form = CategoryFormAdmin
     prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(RegistrationRequest)
+class RegistrationRequestAdmin(admin.ModelAdmin):
+    list_display = ['email', 'user', 'course', 'date_created']
+    list_display_links = ['email']
+    readonly_fields = ['date_created']
+
+
+@admin.register(CourseRequest)
+class CourseRequestAdmin(admin.ModelAdmin):
+    list_display = ['email', 'user', 'course', 'date_created']
+    list_display_links = ['email']
+    readonly_fields = ['date_created']
