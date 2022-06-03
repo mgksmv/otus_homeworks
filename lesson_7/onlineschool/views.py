@@ -67,15 +67,6 @@ class CourseDetailView(DetailView):
         context['registration_request_exists'] = registration_request_exists
         context['course_request_exists'] = course_request_exists
 
-        # user_already_registered = [
-        #     registration_request for registration_request in all_registration_requests
-        #     if registration_request.user == current_user
-        # ]
-        # print('-' * 50)
-        # print(user_already_registered)
-        # for group in groups:
-        #     print(group)
-        # print('-' * 50)
         return context
 
 

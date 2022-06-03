@@ -1,94 +1,43 @@
-{#{% if request.user.is_authenticated %}#}
-{#                        {% for group in object.schedule_set.all %}#}
-{#                            {% if forloop.first %}#}
-{#                                {% if not group.is_announced_later %}#}
-{#                                    <p class="card-text">#}
-{#                                        <i class="fa-solid fa-calendar-days"></i> с {{ group.start_date }}#}
-{#                                    </p>#}
-{#                                    {% for registration_request in group.registrationrequest_set.all %}#}
-{#                                        {% if registration_request.user == request.user %}#}
-{#                                            <a href="#"#}
-{#                                               class="btn btn-primary disabled">Вы уже записались</a>#}
-{#                                        {% endif %}#}
-{#                                    {% empty %}#}
-{#                                        <a href="{% url 'onlineschool:register_registration_request' schedule_slug=group.slug %}"#}
-{#                                           class="btn btn-primary">Записаться</a>#}
-{#                                    {% endfor %}#}
-{#                                {% else %}#}
-{#                                    <p class="card-text">#}
-{#                                        <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже#}
-{#                                    </p>#}
-{#                                    {% for course_request in object.courserequest_set.all %}#}
-{#                                        {% if course_request.user == request.user %}#}
-{#                                            <a href="#"#}
-{#                                               class="btn btn-primary disabled">Мы вам сообщим о старте курса</a>#}
-{#                                        {% endif %}#}
-{#                                    {% empty %}#}
-{#                                        <a href="{% url 'onlineschool:register_course_request' course_slug=object.slug %}"#}
-{#                                           class="btn btn-primary">Сообщить о старте набора</a>#}
-{#                                    {% endfor %}#}
-{#                                {% endif %}#}
-{#                            {% endif %}#}
-{#                        {% empty %}#}
-{#                            <p class="card-text">#}
-{#                                <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже#}
-{#                            </p>#}
-{#                            {% for course_request in object.courserequest_set.all %}#}
-{#                                {% if course_request.user == request.user %}#}
-{#                                    <a href="#"#}
-{#                                       class="btn btn-primary disabled">Мы вам сообщим о старте курса</a>#}
-{#                                {% endif %}#}
-{#                                {% empty %}#}
-{#                                <a href="{% url 'onlineschool:register_course_request' course_slug=object.slug %}"#}
-{#                                   class="btn btn-primary">Сообщить о старте набора</a>#}
-{#                            {% endfor %}#}
-{#                        {% endfor %}#}
-{#{% else %}#}
-{#    {% for group in object.schedule_set.all %}#}
-{#        {% if forloop.first %}#}
-{#            {% if not group.is_announced_later %}#}
-{#                <p class="card-text">#}
-{#                    <i class="fa-solid fa-calendar-days"></i> с {{ group.start_date }}#}
-{#                </p>#}
-{#                <form method="post" class="row g-2"#}
-{#                      action="{% url 'onlineschool:register_registration_request' schedule_slug=group.slug %}">#}
-{#                    {% csrf_token %}#}
-{#                    <div class="col-auto">#}
-{#                        <input type="email" name="email" class="form-control" placeholder="Ваша почта">#}
-{#                    </div>#}
-{#                    <div class="col-auto">#}
-{#                        <input type="submit" class="btn btn-primary" value="Записаться">#}
-{#                    </div>#}
-{#                </form>#}
-{#            {% else %}#}
-{#                <p class="card-text">#}
-{#                    <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже#}
-{#                </p>#}
-{#                <form method="post" class="row g-2"#}
-{#                      action="{% url 'onlineschool:register_course_request' course_slug=object.slug %}">#}
-{#                    {% csrf_token %}#}
-{#                    <div class="col-auto">#}
-{#                        <input type="email" name="email" class="form-control" placeholder="Ваша почта">#}
-{#                    </div>#}
-{#                    <div class="col-auto">#}
-{#                        <input type="submit" class="btn btn-primary" value="Сообщить о старте набора">#}
-{#                    </div>#}
-{#                </form>#}
-{#            {% endif %}#}
-{#        {% endif %}#}
-{#        {% empty %}#}
-{#        <p class="card-text">#}
-{#            <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже#}
-{#        </p>#}
-{#        <form method="post" class="row g-2"#}
-{#              action="{% url 'onlineschool:register_course_request' course_slug=object.slug %}">#}
-{#            {% csrf_token %}#}
-{#            <div class="col-auto">#}
-{#                <input type="email" name="email" class="form-control" placeholder="Ваша почта">#}
-{#            </div>#}
-{#            <div class="col-auto">#}
-{#                <input type="submit" class="btn btn-primary" value="Сообщить о старте набора">#}
-{#            </div>#}
-{#        </form>#}
-{#    {% endfor %}#}
-{#{% endif %}#}
+{% extends 'base.html' %}
+
+{% block title %}Заявки на запись{% endblock %}
+
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="text-center">Заявки на запись на курс</h1>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Email</th>
+                <th scope="col">Пользователь</th>
+                <th scope="col">Группа</th>
+                <th scope="col">Добавить в группу</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for registration_request in object_list %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ registration_request.email }}</td>
+                    {% if registration_request.user %}
+                        <td>{{ registration_request.user }}</td>
+                    {% else %}
+                        <td>Аноним</td>
+                    {% endif %}
+                    <td>
+                        <a href="{% url 'onlineschool:course_detail' course_slug=registration_request.course.course %}">
+                            {{ registration_request.course.course.name }}
+                        </a>
+                    </td>
+                    <td>
+                        <form action="" method="post">
+                            {# TODO: ADD FUNCTIONALITY #}
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
