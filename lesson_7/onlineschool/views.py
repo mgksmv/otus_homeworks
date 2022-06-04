@@ -56,19 +56,21 @@ class CourseDetailView(DetailView):
 
         registration_request_exists = None
         course_request_exists = None
+        user_in_group = None
 
         if current_user.is_authenticated:
             student = Student.objects.filter(user=current_user).first()
-            print(f'STUDENT: {student}')
             if student:
                 registration_request_exists = RegistrationRequest.objects\
                     .filter(student=student, course=course).select_related('student', 'course').exists()
                 course_request_exists = CourseRequest.objects \
                     .filter(student=student, course=course).select_related('student', 'course').exists()
+                user_in_group = student in group.students.all()
 
         context['group'] = group
         context['registration_request_exists'] = registration_request_exists
         context['course_request_exists'] = course_request_exists
+        context['user_in_group'] = user_in_group
 
         return context
 
@@ -157,6 +159,10 @@ class StudentCoursesListView(ListView):
 
 class RegistrationRequestListView(ListView):
     model = RegistrationRequest
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('course', 'student', 'student__user')
 
 
 def add_student_to_group(request, course_slug, user_id):

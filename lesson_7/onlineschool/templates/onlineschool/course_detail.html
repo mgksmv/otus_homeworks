@@ -32,24 +32,28 @@
                             <p class="card-text">
                                 <i class="fa-solid fa-calendar-days"></i> с {{ group.start_date }}
                             </p>
-                            {% if request.user.is_authenticated %}
-                                {% if registration_request_exists %}
-                                    <a href="#" class="btn btn-primary disabled">Вы уже записались</a>
-                                {% else %}
-                                    <a href="{% url 'onlineschool:register_registration_request' course_slug=object.slug %}"
-                                        class="btn btn-primary">Записаться</a>
-                                {% endif %}
+                            {% if user_in_group %}
+                                <a href="#" class="btn btn-success disabled">Вас записали в группу</a>
                             {% else %}
-                                <form method="post" class="row g-2"
-                                    action="{% url 'onlineschool:register_registration_request' course_slug=object.slug %}">
-                                    {% csrf_token %}
-                                    <div class="col-auto">
-                                        <input type="email" name="email" class="form-control" placeholder="Ваша почта">
-                                    </div>
-                                    <div class="col-auto">
-                                        <input type="submit" class="btn btn-primary" value="Записаться">
-                                    </div>
-                                </form>
+                                {% if request.user.is_authenticated %}
+                                    {% if registration_request_exists %}
+                                        <a href="#" class="btn btn-primary disabled">Заявка на запись подана</a>
+                                    {% else %}
+                                        <a href="{% url 'onlineschool:register_registration_request' course_slug=object.slug %}"
+                                            class="btn btn-primary">Записаться</a>
+                                    {% endif %}
+                                {% else %}
+                                    <form method="post" class="row g-2"
+                                        action="{% url 'onlineschool:register_registration_request' course_slug=object.slug %}">
+                                        {% csrf_token %}
+                                        <div class="col-auto">
+                                            <input type="email" name="email" class="form-control" placeholder="Ваша почта">
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="submit" class="btn btn-primary" value="Записаться">
+                                        </div>
+                                    </form>
+                                {% endif %}
                             {% endif %}
                         {% else %}
                             <p class="card-text">

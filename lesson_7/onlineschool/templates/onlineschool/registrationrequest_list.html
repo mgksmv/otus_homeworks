@@ -12,6 +12,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Email</th>
                 <th scope="col">Пользователь</th>
+                <th scope="col">Дата</th>
                 <th scope="col">Курс</th>
                 <th scope="col">Добавить в группу</th>
             </tr>
@@ -26,6 +27,7 @@
                     {% else %}
                         <td>Аноним</td>
                     {% endif %}
+                    <td>{{ registration_request.date_created }}</td>
                     <td>
                         <a href="{% url 'onlineschool:course_detail' course_slug=registration_request.course.slug %}">
                             {{ registration_request.course.name }}
