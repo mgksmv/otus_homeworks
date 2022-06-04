@@ -105,7 +105,6 @@ class Course(models.Model):
     short_description = RichTextUploadingField('Краткое описание', blank=True, null=True)
     description = RichTextUploadingField('Описание')
     teachers = models.ManyToManyField('Teacher', verbose_name='Преподаватели')
-    reviews = models.ManyToManyField('Review', verbose_name='Отзывы', blank=True)
     required_knowledge = RichTextUploadingField('Необходимые знания')
     after_course = RichTextUploadingField('После обучения')
     price = models.PositiveIntegerField('Стоимость (в руб.)', blank=True, null=True)

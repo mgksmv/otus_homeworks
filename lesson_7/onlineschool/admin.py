@@ -55,7 +55,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ['name', 'duration', 'shorten_description']
     list_display_links = ['name']
     search_fields = ['name', 'duration', 'shorten_description']
-    filter_horizontal = ['teachers', 'reviews']
+    filter_horizontal = ['teachers']
     prepopulated_fields = {'slug': ('name',)}
 
 

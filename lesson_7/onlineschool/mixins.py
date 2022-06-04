@@ -1,4 +1,3 @@
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.contrib.auth.mixins import UserPassesTestMixin
 
 
@@ -15,4 +14,11 @@ class RedirectToPreviousPageMixin:
 
 class CheckUserIsTeacher(UserPassesTestMixin):
     def test_func(self):
-        return self.request.user.user_type == '1'
+        if self.request.user.is_authenticated:
+            return self.request.user.user_type == '1'
+
+
+class CheckUserIsStudent(UserPassesTestMixin):
+    def test_func(self):
+        if self.request.user.is_authenticated:
+            return self.request.user.user_type == '2'

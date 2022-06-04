@@ -1,12 +1,14 @@
+from django.db.models import Prefetch
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 
-from .models import Course, Category, Schedule, Student, RegistrationRequest, CourseRequest
+from .models import Course, Category, Schedule, Student, RegistrationRequest, CourseRequest, Teacher
 from .forms import CourseForm, CategoryForm, ScheduleForm
-from .mixins import RedirectToPreviousPageMixin, CheckUserIsTeacher
+from .mixins import RedirectToPreviousPageMixin, CheckUserIsTeacher, CheckUserIsStudent
 
 User = get_user_model()
 
@@ -22,7 +24,12 @@ class CourseListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.select_related('category').prefetch_related('schedule_set')
+        return queryset \
+            .select_related('category') \
+            .prefetch_related(
+                Prefetch('schedule_set',
+                     queryset=Schedule.objects.all().only('course_id', 'start_date', 'is_announced_later'))) \
+            .defer('short_description', 'description', 'required_knowledge', 'after_course', 'price', 'category__slug')
 
 
 class CourseByCategoryListView(ListView):
@@ -32,7 +39,13 @@ class CourseByCategoryListView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(category__slug=self.kwargs['category_slug'])
+        return queryset \
+            .select_related('category') \
+            .prefetch_related(
+                Prefetch('schedule_set',
+                     queryset=Schedule.objects.all().only('course_id', 'start_date', 'is_announced_later'))) \
+            .defer('short_description', 'description', 'required_knowledge', 'after_course', 'price', 'category__slug') \
+            .filter(category__slug=self.kwargs['category_slug'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -45,7 +58,12 @@ class CourseDetailView(DetailView):
     slug_url_kwarg = 'course_slug'
 
     def get_queryset(self):
-        return Course.objects.prefetch_related('schedule_set', 'teachers__user')
+        queryset = super().get_queryset()
+        return queryset.prefetch_related(
+            Prefetch('schedule_set',
+                     queryset=Schedule.objects.all().only('course_id', 'start_date', 'is_announced_later')),
+            Prefetch('teachers', queryset=Teacher.objects.all().only('user', 'bio')), 'teachers__user'
+        ).defer('category_id')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,7 +79,7 @@ class CourseDetailView(DetailView):
         if current_user.is_authenticated:
             student = Student.objects.filter(user=current_user).first()
             if student:
-                registration_request_exists = RegistrationRequest.objects\
+                registration_request_exists = RegistrationRequest.objects \
                     .filter(student=student, course=course).select_related('student', 'course').exists()
                 course_request_exists = CourseRequest.objects \
                     .filter(student=student, course=course).select_related('student', 'course').exists()
@@ -116,6 +134,16 @@ class ScheduleListView(CheckUserIsTeacher, ListView):
     model = Schedule
     paginate_by = 8
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.select_related('course').prefetch_related(
+            Prefetch('students', queryset=Student.objects.select_related('user').only('user__first_name', 'user__last_name'))
+        ) \
+            .defer(
+            'course__short_description', 'course__description', 'course__required_knowledge', 'course__after_course',
+            'course__price', 'course__category_id'
+        )
+
 
 class GroupCreateView(CheckUserIsTeacher, RedirectToPreviousPageMixin, CreateView):
     model = Schedule
@@ -144,28 +172,48 @@ class SearchCourseListView(ListView):
         object_list = None
         query = self.request.GET.get('keyword')
         if query:
-            object_list = self.model.objects.filter(name__icontains=query)
+            object_list = self.model.objects \
+                .select_related('category') \
+                .prefetch_related(
+                    Prefetch('schedule_set',
+                         queryset=Schedule.objects.all().only('course_id', 'start_date', 'is_announced_later'))) \
+                .defer('short_description', 'description', 'required_knowledge', 'after_course', 'price',
+                       'category__slug') \
+                .filter(name__icontains=query)
         return object_list
 
 
-class StudentCoursesListView(ListView):
+class StudentCoursesListView(CheckUserIsStudent, ListView):
     model = Schedule
     template_name = 'onlineschool/student_courses.html'
 
     def get_queryset(self):
+        queryset = super().get_queryset()
         student = Student.objects.get(user=self.request.user)
-        return Schedule.objects.filter(students=student)
+        return queryset.select_related('course').prefetch_related(
+            Prefetch('students', queryset=Student.objects.select_related('user').only('user__first_name', 'user__last_name'))
+        ) \
+            .defer('course__short_description', 'course__description', 'course__required_knowledge',
+                   'course__after_course', 'course__price', 'course__category_id') \
+            .filter(students=student)
 
 
-class RegistrationRequestListView(ListView):
+class RegistrationRequestListView(CheckUserIsTeacher, ListView):
     model = RegistrationRequest
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.select_related('course', 'student', 'student__user')
+        return queryset.select_related('course', 'student', 'student__user') \
+            .only(
+            'email', 'student', 'student__user__first_name', 'student__user__last_name', 'date_created',
+            'course', 'course__name', 'course__slug'
+        )
 
 
 def add_student_to_group(request, course_slug, user_id):
+    if not request.user.is_authenticated or request.user.user_type == '2':
+        raise PermissionDenied
+
     course = get_object_or_404(Course, slug=course_slug)
     groups = course.schedule_set.all()
     user = User.objects.filter(id=user_id).only('first_name', 'last_name', 'email').first()
