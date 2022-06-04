@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils.functional import cached_property
 
 from .managers import UserManager
 from .validators import only_int
@@ -40,5 +41,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             return f'{self.id}'
         return f'{self.first_name} {self.last_name}'
 
+    @cached_property
     def get_full_name(self):
         return str(self)
