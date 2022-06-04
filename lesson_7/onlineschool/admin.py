@@ -76,13 +76,13 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(RegistrationRequest)
 class RegistrationRequestAdmin(admin.ModelAdmin):
-    list_display = ['email', 'user', 'course', 'date_created']
+    list_display = ['email', 'student', 'course', 'date_created']
     list_display_links = ['email']
     readonly_fields = ['date_created']
 
 
 @admin.register(CourseRequest)
 class CourseRequestAdmin(admin.ModelAdmin):
-    list_display = ['email', 'user', 'course', 'date_created']
+    list_display = ['email', 'student', 'course', 'date_created']
     list_display_links = ['email']
     readonly_fields = ['date_created']

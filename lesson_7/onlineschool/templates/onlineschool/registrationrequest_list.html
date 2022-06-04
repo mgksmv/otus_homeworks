@@ -4,6 +4,7 @@
 
 {% block content %}
     <div class="container mt-5">
+        {% include 'includes/messages.html' %}
         <h1 class="text-center">Заявки на запись на курс</h1>
         <table class="table">
             <thead>
@@ -11,7 +12,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Email</th>
                 <th scope="col">Пользователь</th>
-                <th scope="col">Группа</th>
+                <th scope="col">Курс</th>
                 <th scope="col">Добавить в группу</th>
             </tr>
             </thead>
@@ -20,20 +21,28 @@
                 <tr>
                     <th scope="row">{{ forloop.counter }}</th>
                     <td>{{ registration_request.email }}</td>
-                    {% if registration_request.user %}
-                        <td>{{ registration_request.user }}</td>
+                    {% if registration_request.student %}
+                        <td>{{ registration_request.student }}</td>
                     {% else %}
                         <td>Аноним</td>
                     {% endif %}
                     <td>
-                        <a href="{% url 'onlineschool:course_detail' course_slug=registration_request.course.course %}">
-                            {{ registration_request.course.course.name }}
+                        <a href="{% url 'onlineschool:course_detail' course_slug=registration_request.course.slug %}">
+                            {{ registration_request.course.name }}
                         </a>
                     </td>
                     <td>
-                        <form action="" method="post">
-                            {# TODO: ADD FUNCTIONALITY #}
-                        </form>
+                        {% if registration_request.student %}
+                            <a href="{% url 'onlineschool:add_student_to_group' course_slug=registration_request.course.slug user_id=registration_request.student.user.id %}"
+                               class="btn btn-success btn-sm">
+                                Добавить в группу
+                            </a>
+                        {% else %}
+                            <a href="#"
+                               class="btn btn-primary btn-sm">
+                                Отправить ссылку на регистрацию
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

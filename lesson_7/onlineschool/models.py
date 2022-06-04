@@ -160,7 +160,7 @@ class Schedule(models.Model):
 
 
 class RegistrationBase(models.Model):
-    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE, blank=True, null=True)
+    student = models.ForeignKey(Student, verbose_name='Студент', on_delete=models.CASCADE, blank=True, null=True)
     email = models.EmailField('Почта', max_length=32)
     course = models.ForeignKey(Course, verbose_name='Курс', on_delete=models.CASCADE)
     date_created = models.DateField('Дата создания', auto_now_add=True)
@@ -173,8 +173,6 @@ class RegistrationBase(models.Model):
 
 
 class RegistrationRequest(RegistrationBase):
-    course = models.ForeignKey(Schedule, verbose_name='Курс (ближайший)', on_delete=models.CASCADE)
-
     class Meta:
         verbose_name = 'заявка на запись'
         verbose_name_plural = 'Заявки на запись'

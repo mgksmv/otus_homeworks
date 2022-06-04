@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить в группу{% endblock %}
+
+{% block content %}
+
+    <div class="container mt-5">
+        <h1 class="text-center">Добавить в группу
+            {% if user.first_name and user.last_name %}{{ user.first_name }} {{ user.last_name }}{% endif %}
+            ({{ user.email }})
+        </h1>
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <label for="select_group" class="mt-3">Выберите группу</label>
+                    <select name="group" id="select_group" class="form-select my-2">
+                        {% for group in groups %}
+                            <option value="{{ group.id }}">{{ group }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="submit" value="Добавить" class="btn btn-primary">
+                </form>
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </div>
+
+{% endblock %}

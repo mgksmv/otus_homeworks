@@ -1,12 +1,12 @@
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 
 from .models import Course, Category, Schedule, Student, RegistrationRequest, CourseRequest
 from .forms import CourseForm, CategoryForm, ScheduleForm
-from .mixins import RedirectToPreviousPageMixin, PaginatorMixin, CheckUserIsTeacher
+from .mixins import RedirectToPreviousPageMixin, CheckUserIsTeacher
 
 User = get_user_model()
 
@@ -16,7 +16,7 @@ class HomeTemplateView(ListView):
     template_name = 'home.html'
 
 
-class CourseListView(PaginatorMixin, ListView):
+class CourseListView(ListView):
     model = Course
     paginate_by = 8
 
@@ -25,7 +25,7 @@ class CourseListView(PaginatorMixin, ListView):
         return queryset.select_related('category').prefetch_related('schedule_set')
 
 
-class CourseByCategoryListView(PaginatorMixin, ListView):
+class CourseByCategoryListView(ListView):
     model = Course
     template_name = 'onlineschool/courses_by_category.html'
     paginate_by = 8
@@ -58,10 +58,13 @@ class CourseDetailView(DetailView):
         course_request_exists = None
 
         if current_user.is_authenticated:
-            registration_request_exists = RegistrationRequest.objects\
-                .filter(user=current_user, course=group).select_related('user', 'course').exists()
-            course_request_exists = CourseRequest.objects \
-                .filter(user=current_user, course=course).select_related('user', 'course').exists()
+            student = Student.objects.filter(user=current_user).first()
+            print(f'STUDENT: {student}')
+            if student:
+                registration_request_exists = RegistrationRequest.objects\
+                    .filter(student=student, course=course).select_related('student', 'course').exists()
+                course_request_exists = CourseRequest.objects \
+                    .filter(student=student, course=course).select_related('student', 'course').exists()
 
         context['group'] = group
         context['registration_request_exists'] = registration_request_exists
@@ -107,7 +110,7 @@ class CategoryDeleteView(CheckUserIsTeacher, DeleteView):
     success_url = reverse_lazy('home')
 
 
-class ScheduleListView(CheckUserIsTeacher, PaginatorMixin, ListView):
+class ScheduleListView(CheckUserIsTeacher, ListView):
     model = Schedule
     paginate_by = 8
 
@@ -130,7 +133,7 @@ class GroupDeleteView(CheckUserIsTeacher, DeleteView):
     success_url = reverse_lazy('onlineschool:schedule')
 
 
-class SearchCourseListView(PaginatorMixin, ListView):
+class SearchCourseListView(ListView):
     model = Course
     template_name = 'search_course.html'
     paginate_by = 8
@@ -156,22 +159,50 @@ class RegistrationRequestListView(ListView):
     model = RegistrationRequest
 
 
-def register_registration_request(request, schedule_slug):
+def add_student_to_group(request, course_slug, user_id):
+    course = get_object_or_404(Course, slug=course_slug)
+    groups = course.schedule_set.all()
+    user = User.objects.filter(id=user_id).only('first_name', 'last_name', 'email').first()
+    student = Student.objects.filter(user__id=user_id).first()
+
+    if request.method == 'POST':
+        group_id = request.POST.get('group')
+        group_to_add_user = Schedule.objects.filter(id=group_id).first()
+        group_to_add_user.students.add(student)
+        group_to_add_user.save()
+
+        registration_request = RegistrationRequest.objects.filter(student=student, course=course).first()
+        registration_request.delete()
+
+        messages.success(request, 'Пользователь добавлен в группу!')
+        return redirect('onlineschool:registration_requests')
+
+    return render(request, 'onlineschool/add_user_to_group.html', context={'groups': groups, 'user': user})
+
+
+def register_registration_request(request, course_slug):
+    course = get_object_or_404(Course, slug=course_slug)
     current_user = request.user
-    course = get_object_or_404(Schedule, slug=schedule_slug)
 
     if current_user.is_authenticated:
-        request_exists = RegistrationRequest.objects.filter(user=current_user, course=course).exists()
+        if current_user.user_type == '1':
+            messages.error(
+                request, 'Для регистрации вы должны быть студентом :) Зарегистрируйте аккаунт студента для записи.'
+            )
+            return redirect(request.META.get('HTTP_REFERER', '/'))
+
+        student = Student.objects.filter(user=current_user).first()
+        request_exists = RegistrationRequest.objects.filter(student=student, course=course).exists()
         if request_exists:
             messages.error(request, 'Вы уже подавали заявку на этот курс!')
             return redirect(request.META.get('HTTP_REFERER', '/'))
         email = current_user.email
     else:
-        current_user = None
+        student = None
         email = request.POST.get('email')
 
     data = RegistrationRequest.objects.create(
-        user=current_user,
+        student=student,
         email=email,
         course=course
     )
@@ -182,21 +213,28 @@ def register_registration_request(request, schedule_slug):
 
 
 def register_course_request(request, course_slug):
-    current_user = request.user
     course = get_object_or_404(Course, slug=course_slug)
+    current_user = request.user
 
     if current_user.is_authenticated:
-        request_exists = CourseRequest.objects.filter(user=current_user, course=course).exists()
+        if current_user.user_type == '1':
+            messages.error(
+                request, 'Для подачи заявки вы должны быть студентом :)'
+            )
+            return redirect(request.META.get('HTTP_REFERER', '/'))
+
+        student = Student.objects.filter(user=current_user).first()
+        request_exists = CourseRequest.objects.filter(student=student, course=course).exists()
         if request_exists:
             messages.error(request, 'Вы уже подавали заявку на этот курс!')
             return redirect(request.META.get('HTTP_REFERER', '/'))
         email = current_user.email
     else:
-        current_user = None
+        student = None
         email = request.POST.get('email')
 
     data = CourseRequest.objects.create(
-        user=current_user,
+        student=student,
         email=email,
         course=course
     )

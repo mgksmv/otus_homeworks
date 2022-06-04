@@ -36,12 +36,12 @@
                                 {% if registration_request_exists %}
                                     <a href="#" class="btn btn-primary disabled">Вы уже записались</a>
                                 {% else %}
-                                    <a href="{% url 'onlineschool:register_registration_request' schedule_slug=group.slug %}"
+                                    <a href="{% url 'onlineschool:register_registration_request' course_slug=object.slug %}"
                                         class="btn btn-primary">Записаться</a>
                                 {% endif %}
                             {% else %}
                                 <form method="post" class="row g-2"
-                                    action="{% url 'onlineschool:register_registration_request' schedule_slug=group.slug %}">
+                                    action="{% url 'onlineschool:register_registration_request' course_slug=object.slug %}">
                                     {% csrf_token %}
                                     <div class="col-auto">
                                         <input type="email" name="email" class="form-control" placeholder="Ваша почта">
