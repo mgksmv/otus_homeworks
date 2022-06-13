@@ -3,16 +3,30 @@ version: '3.9'
 services:
   web:
     build: .
+    container_name: web
     command: python /code/manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
     ports:
       - 8000:8000
+    restart: on-failure
     depends_on:
       - db
+      - redis
+
+  celery:
+    build: .
+    container_name: celery
+    command: celery -A config worker --loglevel INFO
+    volumes:
+      - .:/code
+    depends_on:
+      - web
+      - redis
 
   db:
     image: postgres
+    container_name: db
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
@@ -22,6 +36,13 @@ services:
       - 5432:5432
     volumes:
       - db-data:/var/lib/postgresql/data/pgdata
+    restart: on-failure
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
 
 volumes:
   db-data:

@@ -1,14 +1,17 @@
 from django.db.models import Prefetch
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 
 from .models import Course, Category, Schedule, Student, RegistrationRequest, CourseRequest, Teacher
-from .forms import CourseForm, CategoryForm, ScheduleForm
+from .forms import CourseForm, CategoryForm, ScheduleForm, ContactForm
 from .mixins import RedirectToPreviousPageMixin, CheckUserIsTeacher, CheckUserIsStudent
+
+from .tasks import send_mail_task
+from config.celery import onlineschool_app
 
 User = get_user_model()
 
@@ -149,6 +152,13 @@ class GroupCreateView(CheckUserIsTeacher, RedirectToPreviousPageMixin, CreateVie
     model = Schedule
     form_class = ScheduleForm
 
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        course_id = self.request.GET.get('create')
+        if course_id:
+            form.fields['course'].initial = course_id
+        return form
+
 
 class GroupUpdateView(CheckUserIsTeacher, RedirectToPreviousPageMixin, UpdateView):
     model = Schedule
@@ -210,6 +220,41 @@ class RegistrationRequestListView(CheckUserIsTeacher, ListView):
         )
 
 
+class Contact(FormView):
+    form_class = ContactForm
+    template_name = 'contact_form.html'
+    success_url = reverse_lazy('contact')
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        current_user = self.request.user
+        if current_user.is_authenticated:
+            form.fields['email'].initial = current_user.email
+            if current_user.first_name and current_user.last_name:
+                form.fields['name'].initial = f'{current_user.first_name} {current_user.last_name}'
+        return form
+
+    def form_valid(self, form):
+        email = form.cleaned_data['email']
+        name = form.cleaned_data['name']
+        message = form.cleaned_data['message']
+
+        send_mail_task.delay(
+            'Сообщение отправлено',
+            f'Мы приняли Ваше сообщение. Попытаемся ответить на него как можно скорее!',
+            email,
+        )
+        send_mail_task.delay(
+            'Обратная связь',
+            f'От: {name} {email}\n'
+            f'Сообщение: \n'
+            f'{message}',
+        )
+
+        messages.success(self.request, 'Сообщение отправлено!')
+        return super().form_valid(form)
+
+
 def add_student_to_group(request, course_slug, user_id):
     if not request.user.is_authenticated or request.user.user_type == '2':
         raise PermissionDenied
@@ -262,6 +307,17 @@ def register_registration_request(request, course_slug):
     )
     data.save()
 
+    send_mail_task.delay(
+        'Заявка на запись подана!',
+        f'Заявка на запись на курс {course.name} успешно подана. Мы Вам сообщим, когда начнётся курс.',
+        email,
+    )
+    send_mail_task.delay(
+        'Новая заявка',
+        f'Подана новая заявка на курс {course.name} от {student if student else email}\n'
+        f'Посмотреть все заявки: {request.get_host() + reverse("onlineschool:registration_requests")}'
+    )
+
     messages.success(request, 'Заявка на запись подана!')
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
@@ -293,6 +349,18 @@ def register_course_request(request, course_slug):
         course=course
     )
     data.save()
+
+    send_mail_task.delay(
+        'Заявка на старт курса подана!',
+        f'Заявка на старт курса {course.name} успешно подана. Мы Вам сообщим, когда начнётся набор в группу.',
+        email,
+    )
+    send_mail_task.delay(
+        'Новая заявка',
+        f'Подана новая заявка на курс {course.name} от {student if student else email}\n'
+        f'Группы на курс ещё нет, начать набор? '
+        f'{request.get_host() + reverse("onlineschool:create_group") + "?create=" + str(course.id)}'
+    )
 
     messages.success(request, 'Заявка подана! Мы вам сообщим о старте курса.')
     return redirect(request.META.get('HTTP_REFERER', '/'))

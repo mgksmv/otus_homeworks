@@ -58,3 +58,9 @@ class ScheduleForm(forms.ModelForm):
             'start_date': forms.DateInput(format=('%Y-%m-%d'), attrs={'type': 'date', 'class': 'form-control'}),
             'end_date': forms.DateInput(format=('%Y-%m-%d'), attrs={'type': 'date', 'class': 'form-control'}),
         }
+
+
+class ContactForm(forms.Form):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
+    name = forms.CharField(label='Имя', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    message = forms.CharField(label='Сообщение', widget=forms.Textarea(attrs={'class': 'form-control'}))
