@@ -12,6 +12,7 @@ services:
     restart: on-failure
     depends_on:
       - db
+      - testdb
       - redis
 
   celery:
@@ -37,6 +38,16 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data/pgdata
     restart: on-failure
+
+  testdb:
+    image: postgres
+    container_name: testdb
+    environment:
+      POSTGRES_DB: testpostgres
+      POSTGRES_USER: testpostgres
+      POSTGRES_PASSWORD: testpostgres
+    ports:
+      - 5433:5432
 
   redis:
     image: redis
