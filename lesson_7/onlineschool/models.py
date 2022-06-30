@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -50,11 +51,25 @@ class Student(models.Model):
         super().save(*args, **kwargs)
 
 
-# Auto create Teacher or Student (one to one) after User was created
+# Auto create Teacher or Student (one to one) when User is created
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         if instance.user_type == '1':
+            group = Group.objects.filter(name='Учитель').first()
+            if not group:
+                group = Group.objects.create(name='Учитель')
+                all_models = ['course', 'schedule', 'category', 'registrationrequest', 'courserequest']
+                prefixes = ['add', 'change', 'delete', 'view']
+                for model in all_models:
+                    for prefix in prefixes:
+                        try:
+                            permission = Permission.objects.get(codename=f'{prefix}_{model}')
+                        except Permission.DoesNotExist:
+                            print(f'Permission with name "can_{prefix}_{model}" does not exist.')
+                            continue
+                        group.permissions.add(permission)
+            instance.groups.add(group)
             Teacher.objects.create(user=instance)
         else:
             Student.objects.create(user=instance)
