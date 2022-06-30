@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import Group
 from django.utils.html import format_html
+from django.apps import apps
 
 from .models import User
 from .forms import CustomUserCreationForm, CustomUserChangeForm
@@ -36,6 +36,7 @@ class UserAdmin(UserAdmin):
                 'photo',
                 'phone',
                 'user_type',
+                'user_permissions',
                 'is_active',
                 'is_admin',
                 'is_staff',
@@ -47,15 +48,14 @@ class UserAdmin(UserAdmin):
     thumbnail.short_description = 'Фото'
     full_name.short_description = 'ФИО'
 
-    list_display = ('thumbnail', 'email', 'full_name', 'birthday')
+    list_display = ('thumbnail', 'email', 'full_name', 'birthday', 'user_type')
     list_display_links = ('thumbnail', 'email')
     search_fields = ('first_name', 'last_name')
+    filter_horizontal = ('groups', 'user_permissions')
 
     ordering = ('email',)
-    exclude = ('groups', 'user_permissions')
-    filter_horizontal = ()
     list_filter = ()
     fieldsets = ()
 
 
-admin.site.unregister(Group)
+apps.get_model('auth.Group')._meta.app_label = 'accounts'
