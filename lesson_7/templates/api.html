@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}API{% endblock %}
+
+{% block content %}
+
+    <div class="container my-5">
+        {% include 'includes/messages.html' %}
+        <h1 class="text-center">API</h1>
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <div class="container mt-5">
+                <h2 class="mb-4">
+                    <a href="{% url 'api_root_view' %}" target="_blank">
+                        {{ request.get_host }}{% url 'api_root_view' %}
+                    </a>
+                </h2>
+                {% if token %}
+                    <p>Ваш токен: </p><h5>{{ token }}</h5>
+                    <form method="post" action="{% url 'generate_token' %}">
+                        {% csrf_token %}
+                        <input type="submit" value="Сгенерировать новый токен" class="btn btn-success">
+                    </form>
+                {% else %}
+                    <h5 class="text-danger">У вас нет токена.</h5>
+                    <form method="post" action="{% url 'generate_token' %}">
+                        {% csrf_token %}
+                        <input type="submit" value="Сгенерировать токен" class="btn btn-success">
+                    </form>
+                {% endif %}
+                </div>
+            </div>
+            <div class="col-2"></div>
+        </div>
+    </div>
+
+{% endblock %}

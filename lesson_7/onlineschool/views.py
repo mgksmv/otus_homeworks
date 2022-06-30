@@ -1,10 +1,11 @@
 from django.db.models import Prefetch
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
-from django.shortcuts import get_object_or_404, redirect, render
+from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
+from django.shortcuts import get_object_or_404, redirect, render, Http404
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
+from rest_framework.authtoken.models import Token
 
 from .models import Course, Category, Schedule, Student, RegistrationRequest, CourseRequest, Teacher
 from .forms import CourseForm, CategoryForm, ScheduleForm, ContactForm
@@ -253,6 +254,29 @@ class Contact(FormView):
 
         messages.success(self.request, 'Сообщение отправлено!')
         return super().form_valid(form)
+
+
+class APITemplateView(TemplateView):
+    template_name = 'api.html'
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        context['token'] = Token.objects.filter(user=request.user).first()
+        return self.render_to_response(context)
+
+
+def generate_token(request):
+    try:
+        user = User.objects.get(id=request.user.id)
+        token = Token.objects.filter(user=user).first()
+        if not token:
+            Token.objects.create(user=user)
+        else:
+            token.delete()
+            Token.objects.create(user=user)
+        return redirect('api_token')
+    except User.DoesNotExist:
+        raise Http404
 
 
 def add_student_to_group(request, course_slug, user_id):
