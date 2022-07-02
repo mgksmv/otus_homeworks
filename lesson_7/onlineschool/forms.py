@@ -45,6 +45,7 @@ class CourseForm(forms.ModelForm):
 
 class ScheduleForm(forms.ModelForm):
     students = forms.ModelMultipleChoiceField(
+        required=False,
         queryset=Student.objects.prefetch_related('user', 'wishlist'),
         widget=forms.SelectMultiple(attrs={'class': 'form-control'})
     )

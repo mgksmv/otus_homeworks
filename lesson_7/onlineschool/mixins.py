@@ -9,7 +9,10 @@ class RedirectToPreviousPageMixin:
         return super().get(request, *args, **kwargs)
 
     def get_success_url(self):
-        return self.request.session['previous_page']
+        try:
+            return self.request.session['previous_page']
+        except KeyError:
+            return self.request.path_info
 
 
 class CheckUserIsTeacher(UserPassesTestMixin):

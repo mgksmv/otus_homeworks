@@ -147,7 +147,7 @@ class Course(models.Model):
 
 class Schedule(models.Model):
     course = models.ForeignKey(Course, verbose_name='Курс', on_delete=models.CASCADE)
-    students = models.ManyToManyField(Student, verbose_name='Студенты', blank=True)
+    students = models.ManyToManyField(Student, verbose_name='Студенты', blank=True, null=True)
     start_date = models.DateField('Дата старта курса')
     end_date = models.DateField('Дата окончания курса')
     is_announced_later = models.BooleanField('Не показывать дату начала курса?')
