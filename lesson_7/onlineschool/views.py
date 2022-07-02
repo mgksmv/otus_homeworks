@@ -1,5 +1,6 @@
 from django.db.models import Prefetch
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render, Http404
 from django.urls import reverse_lazy, reverse
 from django.contrib import messages
@@ -256,7 +257,7 @@ class Contact(FormView):
         return super().form_valid(form)
 
 
-class APITemplateView(TemplateView):
+class APITemplateView(LoginRequiredMixin, TemplateView):
     template_name = 'api.html'
 
     def get(self, request, *args, **kwargs):
