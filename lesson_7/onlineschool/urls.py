@@ -20,8 +20,13 @@ urlpatterns = [
     path('my-courses/', views.StudentCoursesListView.as_view(), name='student_courses'),
     path('category/<slug:category_slug>/', views.CourseByCategoryListView.as_view(), name='course_by_category'),
     path('registration-requests/', views.RegistrationRequestListView.as_view(), name='registration_requests'),
+    path('delete-request/<int:pk>/', views.RegistrationRequestDeleteView.as_view(), name='delete_request'),
     path('add-to-group/<slug:course_slug>/<int:user_id>/', views.add_student_to_group, name='add_student_to_group'),
     path('<slug:course_slug>/', views.CourseDetailView.as_view(), name='course_detail'),
     path('<slug:course_slug>/register/', views.register_registration_request, name='register_registration_request'),
     path('<slug:course_slug>/course-request/', views.register_course_request, name='register_course_request'),
+    path(
+        'send-registration-link/<str:email>/<slug:course_slug>/',
+        views.send_registration_link, name='send_registration_link',
+    ),
 ]

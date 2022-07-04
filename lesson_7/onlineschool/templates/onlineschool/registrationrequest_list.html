@@ -15,12 +15,13 @@
                 <th scope="col">Дата</th>
                 <th scope="col">Курс</th>
                 <th scope="col">Добавить в группу</th>
+                <th scope="col">Удалить</th>
             </tr>
             </thead>
             <tbody>
             {% for registration_request in object_list %}
                 <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
+                    <th scope="row">{{ page_obj.start_index|add:forloop.counter0 }}</th>
                     <td>{{ registration_request.email }}</td>
                     {% if registration_request.student %}
                         <td>{{ registration_request.student }}</td>
@@ -40,15 +41,19 @@
                                 Добавить в группу
                             </a>
                         {% else %}
-                            <a href="#"
+                            <a href="{% url 'onlineschool:send_registration_link' email=registration_request.email course_slug=registration_request.course.slug %}"
                                class="btn btn-primary btn-sm">
                                 Отправить ссылку на регистрацию
                             </a>
                         {% endif %}
                     </td>
+                    <td>
+                        <a href="{% url 'onlineschool:delete_request' pk=registration_request.id %}" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i></a>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+        {% include 'includes/paginator.html' %}
     </div>
 {% endblock %}

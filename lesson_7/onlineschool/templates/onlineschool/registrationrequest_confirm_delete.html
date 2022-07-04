@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Удалить заявку {{ object }}{% endblock %}
+
+{% block content %}
+
+    <div class="container my-5">
+        <h1 class="text-center">Удалить заявку {{ object }}</h1>
+        <div class="row">
+            <div class="col-4"></div>
+            <div class="col-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <p>Вы уверены, что хотите удалить заявку "{{ object }} от {{ object.date_created }}"?</p>
+                    {{ form }}
+                    <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash-can"></i>  Да, удалить
+                    </button>
+                </form>
+                <a href="{% url 'onlineschool:registration_requests' %}" class="btn btn-primary mt-1">
+                    <i class="fa-solid fa-arrow-left"></i>  Назад
+                </a>
+            </div>
+            <div class="col-4"></div>
+        </div>
+    </div>
+
+{% endblock %}
