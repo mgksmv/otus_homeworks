@@ -16,7 +16,8 @@
                         </div>
                     {% endif %}
                     {{ form.as_p }}
-                    <input type="submit" value="Войти" class="btn btn-primary">
+                    <a href="{% url 'accounts:reset_password' %}">Забыли пароль?</a><br>
+                    <input type="submit" value="Войти" class="btn btn-primary mt-3">
                 </form>
             </div>
             <div class="col-4"></div>
