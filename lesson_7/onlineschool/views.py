@@ -212,6 +212,7 @@ class StudentCoursesListView(CheckUserIsStudent, ListView):
 
 class RegistrationRequestListView(CheckUserIsTeacher, ListView):
     model = RegistrationRequest
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -220,6 +221,11 @@ class RegistrationRequestListView(CheckUserIsTeacher, ListView):
             'email', 'student', 'student__user__first_name', 'student__user__last_name', 'date_created',
             'course', 'course__name', 'course__slug'
         )
+
+
+class RegistrationRequestDeleteView(DeleteView):
+    model = RegistrationRequest
+    success_url = reverse_lazy('onlineschool:registration_requests')
 
 
 class Contact(FormView):
@@ -324,6 +330,13 @@ def register_registration_request(request, course_slug):
     else:
         student = None
         email = request.POST.get('email')
+        account_exists = User.objects.filter(email=email).first()
+        if account_exists:
+            messages.error(
+                request,
+                f'У Вас имеется аккаунт, зарегистрированный на почту {email}! Войдите и подайте заявку с аккаунта.'
+            )
+            return redirect(request.META.get('HTTP_REFERER', '/'))
 
     data = RegistrationRequest.objects.create(
         student=student,
@@ -367,6 +380,13 @@ def register_course_request(request, course_slug):
     else:
         student = None
         email = request.POST.get('email')
+        account_exists = User.objects.filter(email=email).first()
+        if account_exists:
+            messages.error(
+                request,
+                f'У Вас имеется аккаунт, зарегистрированный на почту {email}! Войдите и подайте заявку с аккаунта.'
+            )
+            return redirect(request.META.get('HTTP_REFERER', '/'))
 
     data = CourseRequest.objects.create(
         student=student,
@@ -388,4 +408,19 @@ def register_course_request(request, course_slug):
     )
 
     messages.success(request, 'Заявка подана! Мы вам сообщим о старте курса.')
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def send_registration_link(request, email, course_slug):
+    course = Course.objects.filter(slug=course_slug).first()
+    send_mail_task.delay(
+        'Online School. Регистрация.',
+        f'Вы недавно подавали заявку на запись на курс {course.name}\n'
+        f'Чтобы записать Вас в группу, потребуется создать аккаунт в нашем сайте.\n'
+        f'Перейдите по ссылке ниже, чтобы создать новый аккаунт:\n'
+        f'{request.get_host() + reverse("accounts:signup")}',
+        email,
+    )
+
+    messages.success(request, 'Ссылка на регистрацию отправлена.')
     return redirect(request.META.get('HTTP_REFERER', '/'))
