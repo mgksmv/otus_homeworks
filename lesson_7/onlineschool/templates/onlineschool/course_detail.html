@@ -4,7 +4,7 @@
 
 {% block content %}
     <div class="container mt-5">
-        <div class="row">
+        <div class="row pb-5">
             {% include 'includes/messages.html' %}
             <div class="col-7">
                 <div class="my-5">
@@ -106,8 +106,8 @@
 
                 </div>
             </div>
-            <div class="col-3">
-                <img src="{{ object.photo.url }}" alt="..." height="70%" width="auto">
+            <div class="col-5">
+                <img src="{{ object.photo.url }}" alt="..." width="70%" height="auto" class="mx-auto d-block">
             </div>
         </div>
     </div>
