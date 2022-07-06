@@ -6,8 +6,6 @@
 
 `docker compose up -d` Запускаем Docker
 
-`docker compose exec web python manage.py makemigrations` Делаем миграции
-
 `docker compose exec web python manage.py migrate` Применяем миграции и создаём таблицы в БД
 
 `docker compose exec web python manage.py createsuperuser` Создаём супер пользователя
