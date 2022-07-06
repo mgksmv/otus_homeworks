@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
-from django.apps import apps
 
 from .models import User
 from .forms import CustomUserCreationForm, CustomUserChangeForm
@@ -56,6 +55,3 @@ class UserAdmin(UserAdmin):
     ordering = ('email',)
     list_filter = ()
     fieldsets = ()
-
-
-apps.get_model('auth.Group')._meta.app_label = 'accounts'

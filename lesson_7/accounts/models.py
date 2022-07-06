@@ -22,7 +22,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     date_joined = models.DateTimeField('Дата регистрации', auto_now_add=True)
     last_login = models.DateTimeField('Последний вход', auto_now_add=True)
-    is_active = models.BooleanField('Активный', default=True)
+    is_active = models.BooleanField('Активный', default=False)
     is_admin = models.BooleanField('Админ', default=False)
     is_staff = models.BooleanField('Статус персонала', default=False)
     is_superuser = models.BooleanField('Статус суперпользователя', default=False)

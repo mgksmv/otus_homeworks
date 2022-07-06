@@ -5,13 +5,14 @@
 {% block content %}
     <div class="container my-5">
         <div class="row">
+            {% include 'includes/messages.html' %}
             <div class="col-4"></div>
             <div class="col-4">
                 <h1>Регистрация</h1>
                 <form method="post">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <input type="submit" value="Войти" class="btn btn-primary">
+                    <input type="submit" value="Зарегистрироваться" class="btn btn-primary">
                 </form>
             </div>
             <div class="col-4"></div>

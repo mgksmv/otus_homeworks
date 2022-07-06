@@ -1,0 +1,10 @@
+{% autoescape off %}
+
+Здравствуйте, {{ user.first_name }}
+
+Пожалуйста, нажмите на ссылку ниже, чтобы активировать аккаунт и завершить регистрацию.
+http://{{ domain }}{% url 'accounts:activate_account' uidb64=uid token=token %}
+
+Если Вы не регистрировались на сайте, то проигнорируйте это письмо.
+
+{% endautoescape %}
