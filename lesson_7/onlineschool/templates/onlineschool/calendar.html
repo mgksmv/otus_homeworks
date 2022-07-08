@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <div class="container my-5">
+        <h2 class="text-center">Календарь курсов</h2>
+        <div class="row p-3">
+            <div class="col-2">
+                <a class="btn btn-primary btn-sm left" href="{% url 'onlineschool:schedule_calendar' %}?{{ prev_month }}"><i class="fa-solid fa-arrow-left"></i>  Пред. месяц </a>
+            </div>
+            <div class="col-4">
+                <a class="btn btn-outline-primary btn-sm" href="{% url 'onlineschool:schedule_calendar' %}"><i class="fa-solid fa-calendar-day"></i>  В текущий месяц </a>
+            </div>
+            <div class="col-4">
+                <form action="" method="GET">
+                    {{ form }}
+                    <button type="submit" class="btn btn-primary btn-sm">Перейти</button>
+                </form>
+            </div>
+            <div class="col-2">
+                <a class="btn btn-primary btn-sm right" href="{% url 'onlineschool:schedule_calendar' %}?{{ next_month }}">След. месяц  <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+        </div>
+        {{ calendar }}
+    </div>
+
+{% endblock content %}

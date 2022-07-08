@@ -1,3 +1,6 @@
+import calendar
+from datetime import datetime, timedelta
+
 from django.db.models import Prefetch
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -6,6 +9,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
+from django.utils.safestring import mark_safe
 from rest_framework.authtoken.models import Token
 
 from .models import Course, Category, Schedule, Student, RegistrationRequest, CourseRequest, Teacher
@@ -13,6 +17,8 @@ from .forms import CourseForm, CategoryForm, ScheduleForm, ContactForm
 from .mixins import RedirectToPreviousPageMixin, CheckUserIsTeacher, CheckUserIsStudent
 
 from .tasks import send_mail_task
+from .utils import EventCalendar
+from .forms import DateForm
 from config.celery import onlineschool_app
 
 User = get_user_model()
@@ -21,6 +27,16 @@ User = get_user_model()
 class HomeTemplateView(ListView):
     model = Category
     template_name = 'home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_date = datetime.now()
+        cal = EventCalendar(current_date.year, current_date.month, current_date.day)
+        html_cal = cal.formatmonth(withyear=True)
+
+        context['calendar'] = mark_safe(html_cal)
+
+        return context
 
 
 class CourseListView(ListView):
@@ -424,3 +440,48 @@ def send_registration_link(request, email, course_slug):
 
     messages.success(request, 'Ссылка на регистрацию отправлена.')
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+# Calendar
+def get_date(req_day):
+    if req_day:
+        try:
+            year, month, day = (int(x) for x in req_day.split('-'))
+            return datetime(year, month, day)
+        except ValueError:
+            year, month = (int(x) for x in req_day.split('-'))
+            return datetime(year, month, day=1)
+    return datetime.today()
+
+
+def prev_month(current_date):
+    first = current_date.replace(day=1)
+    prev_month = first - timedelta(days=1)
+    month = 'date=' + str(prev_month.year) + '-' + str(prev_month.month)
+    return month
+
+
+def next_month(current_date):
+    days_in_month = calendar.monthrange(current_date.year, current_date.month)[1]
+    last = current_date.replace(day=days_in_month)
+    next_month = last + timedelta(days=1)
+    month = 'date=' + str(next_month.year) + '-' + str(next_month.month)
+    return month
+
+
+class ScheduleCalendarView(ListView):
+    model = Schedule
+    template_name = 'onlineschool/calendar.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_date = get_date(self.request.GET.get('date', None))
+        cal = EventCalendar(current_date.year, current_date.month, current_date.day)
+        html_cal = cal.formatmonth(withyear=True)
+
+        context['calendar'] = mark_safe(html_cal)
+        context['prev_month'] = prev_month(current_date)
+        context['next_month'] = next_month(current_date)
+        context['form'] = DateForm()
+
+        return context

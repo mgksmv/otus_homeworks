@@ -22,6 +22,7 @@ def user_teacher(db):
         last_name='Teacher',
         password='teacher12345',
         user_type='1',
+        is_active=True,
     )
 
 
@@ -33,4 +34,5 @@ def user_student(db):
         last_name='Student',
         password='student12345',
         user_type='2',
+        is_active=True,
     )

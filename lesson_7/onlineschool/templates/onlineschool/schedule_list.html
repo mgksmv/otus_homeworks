@@ -54,6 +54,11 @@
                             </div>
                         </div>
                     </div>
+                {% empty %}
+                    <div class="text-center">
+                        <h5>Запланированных курсов пока нет</h5>
+                        <a href="{% url 'onlineschool:create_group' %}" class="btn btn-success">Запланировать курс</a>
+                    </div>
                 {% endfor %}
             </div>
             <div class="col-2"></div>

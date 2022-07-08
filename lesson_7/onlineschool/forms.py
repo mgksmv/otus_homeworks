@@ -45,9 +45,10 @@ class CourseForm(forms.ModelForm):
 
 class ScheduleForm(forms.ModelForm):
     students = forms.ModelMultipleChoiceField(
+        label='Студенты',
         required=False,
         queryset=Student.objects.prefetch_related('user', 'wishlist'),
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'}),
     )
 
     class Meta:
@@ -65,3 +66,11 @@ class ContactForm(forms.Form):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control'}))
     name = forms.CharField(label='Имя', widget=forms.TextInput(attrs={'class': 'form-control'}))
     message = forms.CharField(label='Сообщение', widget=forms.Textarea(attrs={'class': 'form-control'}))
+
+
+class DateInput(forms.DateInput):
+    input_type = 'date'
+
+
+class DateForm(forms.Form):
+    date = forms.DateField(label='Дата', widget=DateInput())

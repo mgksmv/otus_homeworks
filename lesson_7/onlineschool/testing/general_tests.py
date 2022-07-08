@@ -28,6 +28,7 @@ class Tests:
             'password1': 'test111222333',
             'password2': 'test111222333',
         })
+        User.objects.get(email='test2@test.com').is_active = True
         assert response.status_code == 302
         assert User.objects.all().count() == 1
         assert User.objects.get(email='test2@test.com').first_name == 'Test'

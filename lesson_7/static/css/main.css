@@ -28,3 +28,75 @@ footer {
 .nav-link {
     margin-right: 10px;
 }
+
+.calendar {
+	width: 100%;
+	margin: auto;
+	font-size: 13px;
+  }
+
+.calendar tr, .calendar td {
+	border: 1px solid black;
+}
+
+.calendar .existing-days {
+	background-color: #ebebeb;
+}
+
+.calendar th {
+	padding: 10px;
+	text-align: center;
+	font-size: 18px;
+}
+
+.calendar td {
+	width: 200px;
+	height: 150px;
+	padding: 20px 0px 0px 5px;
+}
+
+.calendar ul {
+	height: 100%;
+	padding: 0px 5px 0px 20px;
+  }
+
+.calendar a {
+	color: #141414;
+}
+
+.calendar a:hover {
+	color: #427edc;
+}
+
+.month {
+	font-size: 25px;
+}
+
+.date {
+	font-size: 16px;
+}
+
+.left {
+    float: left;
+	margin-right: 15px;
+}
+
+.right {
+    float: right;
+}
+
+.clearfix {
+  	margin: 15px;
+}
+
+.today {
+	background-color: #8effdd;
+}
+
+.marked {
+	background-color: #ffe0c269;
+}
+
+.marked-event {
+	background-color: #ffa04169;
+}

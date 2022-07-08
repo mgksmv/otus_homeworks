@@ -1,10 +1,11 @@
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group, Permission
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.urls import reverse
 from ckeditor_uploader.fields import RichTextUploadingField
 
 from slugify import slugify
@@ -91,7 +92,7 @@ class Review(models.Model):
 class Category(models.Model):
     name = models.CharField('Название', max_length=100)
     color = models.CharField('Цвет', max_length=7, default='#0D6EFD')
-    slug = models.SlugField('URL', max_length=50, unique=True)
+    slug = models.SlugField('URL', max_length=150, unique=True)
 
     class Meta:
         verbose_name = 'категория'
@@ -123,7 +124,7 @@ class Course(models.Model):
     required_knowledge = RichTextUploadingField('Необходимые знания')
     after_course = RichTextUploadingField('После обучения')
     price = models.PositiveIntegerField('Стоимость (в руб.)', blank=True, null=True)
-    slug = models.SlugField('URL', max_length=50, unique=True)
+    slug = models.SlugField('URL', max_length=250, unique=True)
 
     class Meta:
         verbose_name = 'курс'
@@ -147,11 +148,11 @@ class Course(models.Model):
 
 class Schedule(models.Model):
     course = models.ForeignKey(Course, verbose_name='Курс', on_delete=models.CASCADE)
-    students = models.ManyToManyField(Student, verbose_name='Студенты', blank=True, null=True)
+    students = models.ManyToManyField(Student, verbose_name='Студенты', blank=True)
     start_date = models.DateField('Дата старта курса')
     end_date = models.DateField('Дата окончания курса')
     is_announced_later = models.BooleanField('Не показывать дату начала курса?')
-    slug = models.SlugField('URL', max_length=50, unique=True)
+    slug = models.SlugField('URL', max_length=250, unique=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -163,6 +164,11 @@ class Schedule(models.Model):
             else:
                 self.slug = new_slug
             self.save()
+
+    @property
+    def get_html_course_url(self):
+        url = reverse('onlineschool:course_detail', args=[self.course.slug])
+        return f'<a href="{url}"> {self.course.name} </a>'
 
     class Meta:
         verbose_name = 'расписание'

@@ -163,7 +163,83 @@
                     {% endfor %}
                 </div>
                 <div class="col-4">
-                    <a href="#" class="btn btn-primary btn-lg">Записаться</a>
+                    <h5>Ближайшая группа:</h5>
+                    {% if not group.is_announced_later %}
+                        {% if group %}
+                            <p class="card-text">
+                                <i class="fa-solid fa-calendar-days"></i> с {{ group.start_date }}
+                            </p>
+                            {% if user_in_group %}
+                                <a href="#" class="btn btn-success disabled">Вас записали в группу</a>
+                            {% else %}
+                                {% if request.user.is_authenticated %}
+                                    {% if registration_request_exists %}
+                                        <a href="#" class="btn btn-primary disabled">Заявка на запись подана</a>
+                                    {% else %}
+                                        <a href="{% url 'onlineschool:register_registration_request' course_slug=object.slug %}"
+                                            class="btn btn-primary">Записаться</a>
+                                    {% endif %}
+                                {% else %}
+                                    <form method="post" class="row g-2"
+                                        action="{% url 'onlineschool:register_registration_request' course_slug=object.slug %}">
+                                        {% csrf_token %}
+                                        <div class="col-auto">
+                                            <input type="email" name="email" class="form-control" placeholder="Ваша почта">
+                                        </div>
+                                        <div class="col-auto">
+                                            <input type="submit" class="btn btn-primary" value="Записаться">
+                                        </div>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <p class="card-text">
+                                <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже
+                            </p>
+                            {% if request.user.is_authenticated %}
+                                {% if course_request_exists %}
+                                    <a href="#" class="btn btn-primary disabled">Мы вам сообщим о старте курса</a>
+                                {% else %}
+                                    <a href="{% url 'onlineschool:register_course_request' course_slug=object.slug %}"
+                                       class="btn btn-primary">Сообщить о старте набора</a>
+                                {% endif %}
+                            {% else %}
+                                <form method="post" class="row g-2"
+                                    action="{% url 'onlineschool:register_course_request' course_slug=object.slug %}">
+                                    {% csrf_token %}
+                                    <div class="col-auto">
+                                        <input type="email" name="email" class="form-control" placeholder="Ваша почта">
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="submit" class="btn btn-primary" value="Сообщить о старте набора">
+                                    </div>
+                                </form>
+                            {% endif %}
+                        {% endif %}
+                    {% else %}
+                        {% if request.user.is_authenticated %}
+                            <p class="card-text">
+                                <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже
+                            </p>
+                            {% if course_request_exists %}
+                                <a href="#" class="btn btn-primary disabled">Мы вам сообщим о старте курса</a>
+                            {% else %}
+                                <a href="{% url 'onlineschool:register_course_request' course_slug=object.slug %}"
+                                   class="btn btn-primary">Сообщить о старте набора</a>
+                            {% endif %}
+                        {% else %}
+                            <form method="post" class="row g-2"
+                                action="{% url 'onlineschool:register_course_request' course_slug=object.slug %}">
+                                {% csrf_token %}
+                                <div class="col-auto">
+                                    <input type="email" name="email" class="form-control" placeholder="Ваша почта">
+                                </div>
+                                <div class="col-auto">
+                                    <input type="submit" class="btn btn-primary" value="Сообщить о старте набора">
+                                </div>
+                            </form>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
         </div>

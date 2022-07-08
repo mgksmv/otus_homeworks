@@ -6,10 +6,9 @@
     <div class="container my-5">
         {% include 'includes/messages.html' %}
         <h1 class="text-center">Добро пожаловать на образовательную платформу!</h1>
-        <div class="row">
-            <div class="col-4"></div>
+        <div class="row pt-3 mt-5">
             <div class="col-4">
-                <h4 class="mt-4">Все категории:</h4>
+                <h4 class="mb-2">Все категории:</h4>
                 <a href="{% url 'onlineschool:courses' %}" class="btn btn-outline-dark my-1">
                     Все
                 </a><br>
@@ -32,7 +31,16 @@
                     <br>
                 {% endfor %}
             </div>
-            <div class="col-4"></div>
+            <div class="col-8">
+                <div>
+                    <h4 class="mb-2 left">Курсы в этом месяце:</h4>
+                    <a href="{% url 'onlineschool:schedule_calendar' %}" class="btn btn-success right mb-2">
+                        <i class="fa-solid fa-calendar-days"></i>
+                          Весь календарь
+                    </a>
+                </div>
+                {{ calendar }}
+            </div>
         </div>
     </div>
 {% endblock %}
