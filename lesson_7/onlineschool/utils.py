@@ -19,12 +19,12 @@ class EventCalendar(HTMLCalendar):
     def formatday(self, day, events):
         month = self.month
         year = self.year
-        events_per_day = events.filter(start_date__day=day, start_date__year=year)
 
         data = ''
 
-        for event in events_per_day:
-            data += f'<li class="pb-2">{event.get_html_course_url}</li>'
+        for event in events:
+            if event.start_date.day == day:
+                data += f'<li class="pb-2">{event.get_html_course_url}</li>'
 
         today = day == datetime.now().day and month == datetime.now().month and year == datetime.now().year
 
@@ -53,7 +53,7 @@ class EventCalendar(HTMLCalendar):
         return f'<tr>{week}</tr>'
 
     def formatmonth(self, withyear=True):
-        events = Schedule.objects.filter(start_date__month=self.month) \
+        events = Schedule.objects.filter(start_date__month=self.month, start_date__year=self.year) \
             .select_related('course') \
             .prefetch_related('students')
 
