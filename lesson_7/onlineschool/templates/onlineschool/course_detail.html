@@ -80,10 +80,10 @@
                             {% endif %}
                         {% endif %}
                     {% else %}
+                        <p class="card-text">
+                            <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже
+                        </p>
                         {% if request.user.is_authenticated %}
-                            <p class="card-text">
-                                <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже
-                            </p>
                             {% if course_request_exists %}
                                 <a href="#" class="btn btn-primary disabled">Мы вам сообщим о старте курса</a>
                             {% else %}
@@ -217,10 +217,10 @@
                             {% endif %}
                         {% endif %}
                     {% else %}
+                        <p class="card-text">
+                            <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже
+                        </p>
                         {% if request.user.is_authenticated %}
-                            <p class="card-text">
-                                <i class="fa-solid fa-calendar-days"></i> о дате старта будет объявлено позже
-                            </p>
                             {% if course_request_exists %}
                                 <a href="#" class="btn btn-primary disabled">Мы вам сообщим о старте курса</a>
                             {% else %}
