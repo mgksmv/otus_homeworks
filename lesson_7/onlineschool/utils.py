@@ -17,21 +17,18 @@ class EventCalendar(HTMLCalendar):
         self.day = day
 
     def formatday(self, day, events):
-        month = self.month
-        year = self.year
-
         data = ''
 
         for event in events:
             if event.start_date.day == day:
                 data += f'<li class="pb-2">{event.get_html_course_url}</li>'
 
-        today = day == datetime.now().day and month == datetime.now().month and year == datetime.now().year
+        today = day == datetime.now().day and self.month == datetime.now().month and self.year == datetime.now().year
 
         if today:
             return f'<td id="day-{day}" class="today" onmouseover="changeBackgroundColorOver({day})" ' \
                    f'onmouseleave="changeBackgroundColorOutToday({day})"><span class="date"><b>{day}</b> ' \
-                   f'<i class="fa-solid fa-calendar-day"></i></span><ul>{data}</ul></td>'
+                   f'Сегодня</span><ul>{data}</ul></td>'
         elif day == self.day:
             return f'<td id="day-{day}" class="marked" onmouseover="changeBackgroundColorOver({day})" ' \
                    f'onmouseleave="changeBackgroundColorOutMarked({day})"><span class="date"><b>{day}</b></span> ' \

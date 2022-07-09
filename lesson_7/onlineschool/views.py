@@ -28,6 +28,10 @@ class HomeTemplateView(ListView):
     model = Category
     template_name = 'home.html'
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.prefetch_related('course_set')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         current_date = datetime.now()
@@ -125,11 +129,20 @@ class CourseUpdateView(CheckUserIsTeacher, RedirectToPreviousPageMixin, UpdateVi
     slug_url_kwarg = 'course_slug'
     template_name_suffix = '_update_form'
 
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'Курс успешно обновлен!')
+        return super().form_valid(form)
+
 
 class CourseDeleteView(CheckUserIsTeacher, DeleteView):
     model = Course
     slug_url_kwarg = 'course_slug'
     success_url = reverse_lazy('onlineschool:courses')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Курс удалён.')
+        return redirect(self.get_success_url())
 
 
 class CategoryCreateView(CheckUserIsTeacher, RedirectToPreviousPageMixin, CreateView):
@@ -144,11 +157,20 @@ class CategoryUpdateView(CheckUserIsTeacher, UpdateView):
     success_url = reverse_lazy('home')
     template_name_suffix = '_update_form'
 
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'Категория успешно обновлена!')
+        return super().form_valid(form)
+
 
 class CategoryDeleteView(CheckUserIsTeacher, DeleteView):
     model = Category
     slug_url_kwarg = 'category_slug'
     success_url = reverse_lazy('home')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Категория удалена.')
+        return redirect(self.get_success_url())
 
 
 class ScheduleListView(CheckUserIsTeacher, ListView):
@@ -184,11 +206,20 @@ class GroupUpdateView(CheckUserIsTeacher, RedirectToPreviousPageMixin, UpdateVie
     slug_url_kwarg = 'group_slug'
     template_name_suffix = '_update_form'
 
+    def form_valid(self, form):
+        self.object = form.save()
+        messages.success(self.request, 'Группа успешно обновлена!')
+        return super().form_valid(form)
+
 
 class GroupDeleteView(CheckUserIsTeacher, DeleteView):
     model = Schedule
     slug_url_kwarg = 'group_slug'
     success_url = reverse_lazy('onlineschool:schedule')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Группа удалена.')
+        return redirect(self.get_success_url())
 
 
 class SearchCourseListView(ListView):
@@ -242,6 +273,10 @@ class RegistrationRequestListView(CheckUserIsTeacher, ListView):
 class RegistrationRequestDeleteView(DeleteView):
     model = RegistrationRequest
     success_url = reverse_lazy('onlineschool:registration_requests')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Заявка удалена.')
+        return redirect(self.get_success_url())
 
 
 class Contact(FormView):

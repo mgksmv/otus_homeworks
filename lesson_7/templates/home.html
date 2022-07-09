@@ -14,18 +14,27 @@
                 </a><br>
                 {% for category in object_list %}
                     <a href="{% url 'onlineschool:course_by_category' category_slug=category.slug %}"
-                       class="btn btn-outline-light my-1"
+                       class="btn btn-outline-light position-relative my-1"
                        style="color: #1b1b1b; border-color: {{ category.color }};">
                         {{ category.name }}
+                        {% if category.course_set.count %}
+                            {% if category.course_set.count == 1 %}
+                                <span class="badge bg-secondary">1 курс</span>
+                            {% elif category.course_set.count > 1 and category.course_set.count < 5 %}
+                                <span class="badge bg-secondary">{{ category.course_set.count }} курса</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ category.course_set.count }} курсов</span>
+                            {% endif %}
+                        {% endif %}
                     </a>
                     {% if request.user.user_type == '1' %}
                         <a href="{% url 'onlineschool:update_category' category_slug=category.slug %}"
                            class="badge bg-success" style="text-decoration: none;" >
-                            Редактировать
+                            <i class="fa-solid fa-pen-to-square"></i>
                         </a>
                         <a href="{% url 'onlineschool:delete_category' category_slug=category.slug %}"
                            class="badge bg-danger" style="text-decoration: none;" >
-                            Удалить
+                            <i class="fa-solid fa-trash-can"></i>
                         </a>
                     {% endif %}
                     <br>
@@ -34,7 +43,7 @@
             <div class="col-8">
                 <div>
                     <h4 class="mb-2 left">Курсы в этом месяце:</h4>
-                    <a href="{% url 'onlineschool:schedule_calendar' %}" class="btn btn-success right mb-2">
+                    <a href="{% url 'onlineschool:schedule_calendar' %}" class="btn btn-primary right mb-2">
                         <i class="fa-solid fa-calendar-days"></i>
                           Весь календарь
                     </a>

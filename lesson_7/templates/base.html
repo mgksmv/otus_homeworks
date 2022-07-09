@@ -42,7 +42,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{% url 'onlineschool:courses' %}">
-                            Все курсы
+                            Курсы
                         </a>
                     </li>
                     <li class="nav-item">
@@ -57,10 +57,10 @@
                     </li>
                     {% if user.is_authenticated %}
                         {% if request.user.user_type == '1' %}
-                            <li class="nav-item dropdown">
-                                <a class="btn btn-secondary dropdown-toggle button-margin" href="#" role="button" id="dropdown_1"
-                                   data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-chalkboard-user"></i>  Для преподавателей
+                            <li class="nav-item dropdown align-self-center">
+                                <a class="btn btn-sm btn-secondary dropdown-toggle button-margin" href="#"
+                                   role="button" id="dropdown_1" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa-solid fa-chalkboard-user"></i>  Для преподов
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="dropdown_1">
                                     <li>
@@ -91,8 +91,8 @@
                                 </ul>
                             </li>
                         {% endif %}
-                        <li class="nav-item dropdown">
-                            <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdown_2"
+                        <li class="nav-item dropdown align-self-center">
+                            <a class="btn btn-sm btn-secondary dropdown-toggle" href="#" role="button" id="dropdown_2"
                                data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fa-solid fa-user"></i>  {{ user.email }}
                             </a>
@@ -126,9 +126,9 @@
                     {% endif %}
                 </ul>
                 <form method="get" action="{% url 'onlineschool:search' %}" class="d-flex">
-                    <input name="keyword" class="form-control me-2" type="search" placeholder="Искать..."
+                    <input name="keyword" class="form-control form-control-sm me-2" type="search" placeholder="Искать..."
                            aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Поиск</button>
+                    <button class="btn btn-sm btn-outline-success" type="submit">Поиск</button>
                 </form>
             </div>
         </div>
