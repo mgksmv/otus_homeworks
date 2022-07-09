@@ -22,7 +22,7 @@ class Tests:
         response = client.get('/courses/create-group/')
         assert response.status_code == 200
 
-    def test_create_schedule_page_unauthorized(self, client):
+    def test_create_schedule_page_unauthenticated(self, client):
         response = client.get('/courses/create-group/')
         assert response.status_code == 302
 

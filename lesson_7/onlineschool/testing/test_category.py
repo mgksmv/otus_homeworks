@@ -9,7 +9,7 @@ class Tests:
         response = client.get('/courses/create-category/')
         assert response.status_code == 200
 
-    def test_create_category_page_unauthorized(self, client):
+    def test_create_category_page_unauthenticated(self, client):
         response = client.get('/courses/create-category/')
         assert response.status_code == 302
 

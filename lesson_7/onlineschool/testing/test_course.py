@@ -27,7 +27,7 @@ class Tests:
         response = client.get('/courses/create-course/')
         assert response.status_code == 200
 
-    def test_create_course_page_unauthorized(self, client):
+    def test_create_course_page_unauthenticated(self, client):
         response = client.get('/courses/create-course/')
         assert response.status_code == 302
 
