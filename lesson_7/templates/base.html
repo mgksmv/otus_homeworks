@@ -117,12 +117,14 @@
                             </ul>
                         </li>
                     {% else %}
-                        <a href="{% url 'accounts:login' %}" class="btn btn-primary button-margin">
-                            <i class="fa-solid fa-right-to-bracket"></i>  Войти
-                        </a>
-                        <a href="{% url 'accounts:signup' %}" class="btn btn-success">
-                            <i class="fa-solid fa-user-plus"></i>  Зарегистрироваться
-                        </a>
+                        <div class="align-self-center">
+                            <a href="{% url 'accounts:login' %}" class="btn btn-sm btn-primary button-margin">
+                                <i class="fa-solid fa-right-to-bracket"></i>  Войти
+                            </a>
+                            <a href="{% url 'accounts:signup' %}" class="btn btn-sm btn-success">
+                                <i class="fa-solid fa-user-plus"></i>  Зарегистрироваться
+                            </a>
+                        </div>
                     {% endif %}
                 </ul>
                 <form method="get" action="{% url 'onlineschool:search' %}" class="d-flex">

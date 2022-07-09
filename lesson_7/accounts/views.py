@@ -13,6 +13,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from .forms import CustomUserCreationForm
 from .tokens import token_generator
 from .tasks import send_activation_email
+from onlineschool.models import Student, RegistrationRequest
 from config.celery import onlineschool_app
 
 User = get_user_model()
@@ -66,6 +67,15 @@ def activate_account(request, uidb64, token):
     if user and token_generator.check_token(user, token):
         user.is_active = True
         user.save()
+
+        if user.user_type == '2':
+            student_instance = Student.objects.get(user=user)
+            user_registration_requests = RegistrationRequest.objects.filter(email=user.email).all()
+            if user_registration_requests:
+                for registration_request in user_registration_requests:
+                    registration_request.student = student_instance
+                    registration_request.save()
+
         messages.success(request, 'Ваш аккаунт активирован. Теперь Вы можете войти.')
     else:
         messages.error(request, 'Ссылка недействительна!')
