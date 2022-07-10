@@ -194,6 +194,7 @@ class RegistrationBase(models.Model):
 
 class RegistrationRequest(RegistrationBase):
     class Meta:
+        ordering = ['-date_created']
         verbose_name = 'заявка на запись'
         verbose_name_plural = 'Заявки на запись'
 

@@ -9,7 +9,7 @@ class EventCalendar(HTMLCalendar):
     def __init__(self, year=None, month=None, day=None):
         super().__init__()
         try:
-            locale.setlocale(locale.LC_TIME, 'ru_RU.utf8')
+            self.locale = locale.getdefaultlocale()
         except:
             pass
         self.year = year
