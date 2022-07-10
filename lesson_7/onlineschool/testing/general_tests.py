@@ -1,12 +1,12 @@
 import pytest
 from django.contrib.auth import get_user_model
 
-from .test_course import create_course
+from onlineschool.testing.test_course import create_course
 
 User = get_user_model()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True, reset_sequences=True)
 class Tests:
     def test_superuser(self, user):
         get_user = User.objects.get(email='test@test.com')
