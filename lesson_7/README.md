@@ -2,7 +2,7 @@
 
 ### Чтобы запустить проект:
 
-Добавляем SECRET_KEY и DEBUG в .env и убраем с названия часть .template
+Добавляем SECRET_KEY и DEBUG в .env и убираем с названия часть .template
 
 `docker compose up -d` Запускаем Docker
 
@@ -15,3 +15,5 @@
 Переходим в `http://127.0.0.1:8000/admin` и вводим данные только что созданного супер пользователя
 
 Если при переходе на сайт в консоли выходит ошибка "ValueError: Dependency on app with no migrations", то перезагружаем Docker `docker compose down` и `docker compose up -d`
+
+`docker compose exec web pytest` - запустить тесты
