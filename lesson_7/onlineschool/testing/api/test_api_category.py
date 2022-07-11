@@ -36,7 +36,7 @@ class Tests:
 
         assert response.status_code == HTTP_401_UNAUTHORIZED
 
-    def test_post_schedule_authorized(self, user, token):
+    def test_post_category_authorized(self, user, token):
         api_client = APIClient()
         api_client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         data = {
@@ -50,10 +50,33 @@ class Tests:
 
         category = Category.objects.filter(id=response.data['id']).first()
 
-        assert Category.objects.filter(id=response.data['id']).exists() == True
+        assert Category.objects.filter(id=response.data['id']).exists() is True
         assert category.name == 'Web Development'
         assert category.color == '#0e72ed'
         assert category.slug == 'web-development'
+
+    def test_put_category_unauthorized(self, client, user, category):
+        response = client.put(f'{PATH}{category.id}/')
+
+        assert response.status_code == HTTP_401_UNAUTHORIZED
+
+    def test_put_category_authorized(self, user, token, category):
+        api_client = APIClient()
+        api_client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        data = {
+            'name': 'WEB',
+            'color': '#000',
+            'slug': 'web'
+        }
+        response = api_client.put(f'{PATH}{category.id}/', data)
+
+        assert response.status_code == HTTP_200_OK
+
+        category_ = Category.objects.filter(id=response.data['id']).first()
+
+        assert category_.name == 'WEB'
+        assert category_.color == '#000'
+        assert category_.slug == 'web'
 
     def test_delete_category_authorized(self, client, category, token):
         api_client = APIClient()

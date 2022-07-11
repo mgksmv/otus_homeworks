@@ -66,10 +66,39 @@ class Tests:
 
         course = Course.objects.filter(id=response.data['id']).first()
 
-        assert Course.objects.filter(id=response.data['id']).exists() == True
+        assert Course.objects.filter(id=response.data['id']).exists() is True
         assert course.name == 'Fullstack разработчик'
         assert course.category.id == category.id
         assert teacher in course.teachers.all()
+
+    def test_put_course_unauthorized(self, client, user, course):
+        response = client.put(f'{PATH}{course.id}/')
+
+        assert response.status_code == HTTP_401_UNAUTHORIZED
+
+    def test_put_course_authorized(self, user, token, course):
+        api_client = APIClient()
+        api_client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        data = {
+            'name': 'Fullstack разработчик на Python',
+            'duration': 10,
+            'description': 'Fullstack разработчик на Python + Vue.js',
+            'required_knowledge': 'Базовые знания Python, HTML, CSS',
+            'after_course': 'После курса вы будете работать в Google (но это не точно)',
+            'price': 100000,
+            'slug': 'fullstack-razrabotchik',
+            'category': course.category.id,
+            'teachers': [teacher.id for teacher in course.teachers.all()]
+        }
+        response = api_client.put(f'{PATH}{course.id}/', data)
+
+        assert response.status_code == HTTP_200_OK
+
+        course = Course.objects.filter(id=response.data['id']).first()
+
+        assert course.name == 'Fullstack разработчик на Python'
+        assert course.duration == 10
+        assert course.price == 100000
 
     def test_delete_course_authorized(self, client, course, token):
         api_client = APIClient()

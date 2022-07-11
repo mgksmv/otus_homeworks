@@ -1,3 +1,4 @@
+import datetime
 import pytest
 
 from rest_framework.test import APIClient
@@ -55,8 +56,33 @@ class Tests:
 
         schedule = Schedule.objects.filter(id=response.data['id']).first()
 
-        assert Schedule.objects.filter(id=response.data['id']).exists() == True
+        assert Schedule.objects.filter(id=response.data['id']).exists() is True
         assert schedule.course == course
+        assert schedule.start_date == datetime.date(2022, 10, 1)
+
+    def test_put_schedule_unauthorized(self, client, user, schedule):
+        response = client.put(f'{PATH}{schedule.id}/')
+
+        assert response.status_code == HTTP_401_UNAUTHORIZED
+
+    def test_put_schedule_authorized(self, user, token, course, schedule):
+        api_client = APIClient()
+        api_client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        data = {
+            'course': course.id,
+            'start_date': '2022-11-11',
+            'end_date': '2023-04-01',
+            'is_announced_later': True,
+            'slug': 'fullstack-razrabotchik-8-2022',
+        }
+        response = api_client.put(f'{PATH}{schedule.id}/', data)
+
+        assert response.status_code == HTTP_200_OK
+
+        schedule_ = Schedule.objects.filter(id=response.data['id']).first()
+
+        assert schedule_.start_date == datetime.date(2022, 11, 11)
+        assert schedule_.is_announced_later is True
 
     def test_delete_schedule_authorized(self, client, schedule, token):
         api_client = APIClient()
