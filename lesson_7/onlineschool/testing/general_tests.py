@@ -1,8 +1,6 @@
 import pytest
 from django.contrib.auth import get_user_model
 
-from onlineschool.testing.test_course import create_course
-
 User = get_user_model()
 
 
@@ -61,7 +59,7 @@ class Tests:
         assert response.status_code == 200
         assert 'Ничего не найдено'.encode('utf-8') in response.content
 
-    def test_search_existed_course(self, client, user, create_course):  # create_course is a fixture from test_course.py
+    def test_search_existed_course(self, client, user, course):
         response = client.get('/courses/search/?keyword=fulls')
         assert response.status_code == 200
         assert 'Ничего не найдено'.encode('utf-8') not in response.content

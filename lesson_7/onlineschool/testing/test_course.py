@@ -3,24 +3,6 @@ import pytest
 from onlineschool.models import Course, Category, Teacher
 
 
-@pytest.fixture()
-def create_course(db, user):
-    category = Category.objects.create(name='Web Development', color='#0e72ed', slug='web-development')
-    teacher = Teacher.objects.get(user=user)
-    course = Course.objects.create(
-        category=category,
-        name='Fullstack разработчик',
-        duration=6,
-        description='Fullstack разработчик на Python + Vue.js',
-        required_knowledge='Базовые знания Python, HTML, CSS',
-        after_course='После курса вы будете работать в Google (но это не точно)',
-        price=50000,
-        slug='fullstack-razrabotchik',
-    )
-    course.teachers.set([teacher])
-    return course
-
-
 @pytest.mark.django_db(transaction=True, reset_sequences=True)
 class Tests:
     def test_create_course_page(self, client, login_user):
@@ -52,14 +34,14 @@ class Tests:
         assert Course.objects.get(slug='fullstack-razrabotchik').name == 'Fullstack разработчик'
         assert Course.objects.all().count() == 1
 
-    def test_update_course(self, client, user, login_user, create_course):
+    def test_update_course(self, client, user, login_user, course):
         response = client.post('/courses/update-course/fullstack-razrabotchik/', {
-            'category': create_course.category.id,
+            'category': course.category.id,
             'name': 'Fullstack разработчик 2.0',
-            'duration': create_course.duration,
-            'teachers': [teacher.id for teacher in create_course.teachers.all()],
+            'duration': course.duration,
+            'teachers': [teacher.id for teacher in course.teachers.all()],
             'description': 'Теперь программа курса стала насыщеннее...',
-            'required_knowledge': create_course.required_knowledge,
+            'required_knowledge': course.required_knowledge,
             'after_course': 'Теперь после курса вы будете не только в Google, но ещё и в Microsoft на ночной смене!',
             'price': 100000,
             'slug': 'fullstack-razrabotchik',
@@ -69,14 +51,14 @@ class Tests:
         assert Course.objects.get(slug='fullstack-razrabotchik').name == 'Fullstack разработчик 2.0'
         assert Course.objects.all().count() == 1
 
-    def test_course_list_view(self, client, create_course):
+    def test_course_list_view(self, client, course):
         response = client.get('/courses/')
 
         assert response.status_code == 200
         assert 'Все курсы'.encode('utf-8') in response.content
         assert 'Fullstack разработчик'.encode('utf-8') in response.content
 
-    def test_course_detail_view(self, client, user, create_course):
+    def test_course_detail_view(self, client, user, course):
         response = client.get('/courses/fullstack-razrabotchik/')
 
         assert response.status_code == 200

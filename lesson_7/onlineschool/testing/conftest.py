@@ -1,5 +1,8 @@
 import pytest
 from django.contrib.auth import get_user_model
+from rest_framework.authtoken.models import Token
+
+from onlineschool.models import Schedule, Course, Category, Teacher
 
 User = get_user_model()
 
@@ -36,3 +39,44 @@ def user_student(db):
         user_type='2',
         is_active=True,
     )
+
+
+@pytest.fixture()
+def token(user):
+    return Token.objects.create(user=user)
+
+
+@pytest.fixture()
+def course(db, user):
+    category = Category.objects.create(name='Web Development', color='#0e72ed', slug='web-development')
+    teacher = Teacher.objects.get(user=user)
+    course = Course.objects.create(
+        category=category,
+        name='Fullstack разработчик',
+        duration=6,
+        description='Fullstack разработчик на Python + Vue.js',
+        required_knowledge='Базовые знания Python, HTML, CSS',
+        after_course='После курса вы будете работать в Google (но это не точно)',
+        price=50000,
+        slug='fullstack-razrabotchik',
+    )
+    course.teachers.set([teacher])
+    return course
+
+
+@pytest.fixture()
+def schedule(db, user, course):
+    schedule = Schedule.objects.create(
+        course=course,
+        start_date='2022-08-01',
+        end_date='2023-02-01',
+        is_announced_later=False,
+        slug='fullstack-razrabotchik-8-2022',
+    )
+    return schedule
+
+
+@pytest.fixture()
+def category(db, user):
+    category = Category.objects.create(name='Web Development', color='#0e72ed', slug='web-development')
+    return category
