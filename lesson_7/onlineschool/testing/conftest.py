@@ -47,6 +47,16 @@ def token(user):
 
 
 @pytest.fixture()
+def token_teacher(user_teacher):
+    return Token.objects.create(user=user_teacher)
+
+
+@pytest.fixture()
+def token_student(user_student):
+    return Token.objects.create(user=user_student)
+
+
+@pytest.fixture()
 def course(db, user):
     category = Category.objects.create(name='Web Development', color='#0e72ed', slug='web-development')
     teacher = Teacher.objects.get(user=user)
