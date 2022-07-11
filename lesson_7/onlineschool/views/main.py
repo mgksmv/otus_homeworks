@@ -42,7 +42,6 @@ class SearchCourseListView(ListView):
     paginate_by = 8
 
     def get_queryset(self):
-        object_list = None
         query = self.request.GET.get('keyword')
         if query:
             object_list = self.model.objects \
@@ -53,7 +52,8 @@ class SearchCourseListView(ListView):
                 .defer('short_description', 'description', 'required_knowledge', 'after_course', 'price',
                        'category__slug') \
                 .filter(name__icontains=query)
-        return object_list
+            return object_list
+        return []
 
 
 class Contact(FormView):
