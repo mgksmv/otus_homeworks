@@ -1,7 +1,16 @@
 import graphene
 from graphene_django import DjangoObjectType
+from django.contrib.auth import get_user_model
 
 from onlineschool.models import Category, Schedule, Course, Teacher, Student
+
+User = get_user_model()
+
+
+class UserType(DjangoObjectType):
+    class Meta:
+        model = User
+        fields = '__all__'
 
 
 class CategoryType(DjangoObjectType):
@@ -35,11 +44,15 @@ class StudentType(DjangoObjectType):
 
 
 class Query(graphene.ObjectType):
+    all_users = graphene.List(UserType)
     all_categories = graphene.List(CategoryType)
     all_schedule = graphene.List(ScheduleType)
     all_courses = graphene.List(CourseType)
     all_teachers = graphene.List(TeacherType)
     all_students = graphene.List(StudentType)
+
+    def resolve_all_users(self, info):
+        return User.objects.all()
 
     def resolve_all_categories(self, info):
         return Category.objects.all()
