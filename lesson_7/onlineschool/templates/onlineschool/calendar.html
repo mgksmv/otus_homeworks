@@ -8,10 +8,14 @@
         <h2 class="text-center">Календарь курсов</h2>
         <div class="row p-3">
             <div class="col-2">
-                <a class="btn btn-primary btn-sm left" href="{% url 'onlineschool:schedule_calendar' %}?{{ prev_month }}"><i class="fa-solid fa-arrow-left"></i>  Пред. месяц </a>
+                <button id="prev-month" class="dont-jump btn btn-primary btn-sm left" value="{{ prev_month }}">
+                    <i class="fa-solid fa-arrow-left"></i>  Пред. месяц
+                </button>
             </div>
             <div class="col-4">
-                <a class="btn btn-outline-primary btn-sm" href="{% url 'onlineschool:schedule_calendar' %}"><i class="fa-solid fa-calendar-day"></i>  В текущий месяц </a>
+                <button id="current-month" class="dont-jump btn btn-primary btn-sm right" value="{{ current_month }}">
+                    <i class="fa-solid fa-calendar-day"></i>  В текущий месяц
+                </button>
             </div>
             <div class="col-4">
                 <form action="" method="GET">
@@ -20,10 +24,15 @@
                 </form>
             </div>
             <div class="col-2">
-                <a class="btn btn-primary btn-sm right" href="{% url 'onlineschool:schedule_calendar' %}?{{ next_month }}">След. месяц  <i class="fa-solid fa-arrow-right"></i></a>
+                <button id="next-month" class="dont-jump btn btn-primary btn-sm right" value="{{ next_month }}">
+                    След. месяц   <i class="fa-solid fa-arrow-right"></i>
+                </button>
             </div>
         </div>
-        {{ calendar }}
+        <div class="loader ajax-loader text-center" style="display: none">Загрузка...</div>
+        <div id="calendar">
+            {{ calendar }}
+        </div>
     </div>
 
 {% endblock content %}

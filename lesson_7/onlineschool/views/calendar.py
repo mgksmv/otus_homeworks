@@ -1,6 +1,7 @@
 import calendar
 from datetime import datetime, timedelta
 
+from django.http import JsonResponse
 from django.views.generic import ListView
 from django.utils.safestring import mark_safe
 
@@ -35,6 +36,20 @@ def get_next_month(current_date):
     return month
 
 
+def get_current_month(current_date):
+    month = 'date=' + str(current_date.year) + '-' + str(current_date.month)
+    return month
+
+
+def get_month_ajax(request):
+    date = get_date(request.GET.get('date', None))
+    cal = EventCalendar(date.year, date.month, date.day)
+    html_cal = cal.formatmonth(withyear=True)
+    prev_month = get_prev_month(date)
+    next_month = get_next_month(date)
+    return JsonResponse({'data': html_cal, 'prev_month': prev_month, 'next_month': next_month})
+
+
 class ScheduleCalendarView(ListView):
     model = Schedule
     template_name = 'onlineschool/calendar.html'
@@ -48,6 +63,7 @@ class ScheduleCalendarView(ListView):
         context['calendar'] = mark_safe(html_cal)
         context['prev_month'] = get_prev_month(current_date)
         context['next_month'] = get_next_month(current_date)
+        context['current_month'] = get_current_month(current_date)
         context['form'] = DateForm()
 
         return context

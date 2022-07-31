@@ -25,6 +25,7 @@ __all__ = (
     'GroupDeleteView',
     'StudentCoursesListView',
     'ScheduleCalendarView',
+    'get_month_ajax',
 )
 
 from .main import (
@@ -58,4 +59,4 @@ from .registration_requests import (
     register_course_request,
     send_registration_link,
 )
-from .calendar import ScheduleCalendarView
+from .calendar import ScheduleCalendarView, get_month_ajax
